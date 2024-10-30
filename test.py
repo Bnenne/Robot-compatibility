@@ -2,7 +2,7 @@ import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
 
-data = pd.read_csv('finalized_combined.csv', nrows=20)
+data = pd.read_csv('finalized_combined.csv')
 
 red1 = data[['red1', 'red1_epa_pre_champs']]
 red1.rename(columns={'red1': 'teams', 'red1_epa_pre_champs': 'epa'}, inplace=True)
@@ -22,7 +22,9 @@ blue2.rename(columns={'blue2': 'teams', 'blue2_epa_pre_champs': 'epa'}, inplace=
 blue3 = data[['blue3', 'blue3_epa_pre_champs']]
 blue3.rename(columns={'blue3': 'teams', 'blue3_epa_pre_champs': 'epa'}, inplace=True)
 
-teams = pd.concat([red1, red2, red3, blue1, blue2, blue3]).drop_duplicates()
+teams = pd.concat([red1, red2, red3, blue1, blue2, blue3]).drop_duplicates('teams').sort_values('epa', ascending=False)
+
+teams = teams.head(20)
 
 sns.set_theme(style='whitegrid')
 
