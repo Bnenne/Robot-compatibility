@@ -11,7 +11,7 @@ load_dotenv()
 
 api_key = os.getenv("API_KEY")
 
-event_key = '2024wila'
+event_key = '2024ksla'
 
 teams = requests.get('https://www.thebluealliance.com/api/v3/event/'+event_key+'/teams/simple?X-TBA-Auth-Key='+api_key)
 
@@ -149,24 +149,26 @@ intake_data_filtered = pd.read_csv('team_intake.csv')
 #
 # teams = pd.concat([red1, red2, red3, blue1, blue2, blue3]).drop_duplicates('teams').sort_values('epa', ascending=False)
 
-intake_data = intake_data.sample(5)
-intake_data_filtered = intake_data_filtered.sample(5)
+sample_size = 20
+
+intake_data = intake_data.sample(sample_size)
+intake_data_filtered = intake_data_filtered.sample(sample_size)
 
 sns.set_theme(style='whitegrid')
 
-sns.barplot(x="source", y="team", data=intake_data,
+sns.barplot(x="source", y="team", data=intake_data_filtered,
             label="source", color="r", orient='h')
 
-sns.barplot(x="speaker", y="team", data=intake_data,
+sns.barplot(x="speaker", y="team", data=intake_data_filtered,
             label="speaker", color="b", orient='h')
 
-sns.barplot(x="center", y="team", data=intake_data,
+sns.barplot(x="center", y="team", data=intake_data_filtered,
             label="center", color="g", orient='h')
 
-sns.barplot(x="amp", y="team", data=intake_data,
+sns.barplot(x="amp", y="team", data=intake_data_filtered,
             label="amp", color="m", orient='h')
 
-sns.barplot(x="trap", y="team", data=intake_data,
+sns.barplot(x="trap", y="team", data=intake_data_filtered,
             label="trap", color="y", orient='h')
 
 plt.show()
