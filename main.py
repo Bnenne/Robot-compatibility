@@ -12,27 +12,25 @@ r = requests.get('http://team1710scouting.vercel.app/api/'+event_key)
 team_actions = []
 
 for t in teams.json():
-    team_actions.append({'team': t.get('team_number'), 'actions': []})
+    team_actions.append({'team': t.get('team_number'), 'actions':{'auto':[], 'teleOp':[]}})
 
 for t in team_actions:
     for s in r.json():
         for a in s.get('game').get('actions'):
             if s.get('team') == t.get('team'):
-                t.get('actions').append(a)
+                if a.get('phase') == 'auto':
+                    t.get('actions').get('auto').append(a)
+                if a.get('phase') == 'teleOp':
+                    t.get('actions').get('teleOp').append(a)
 
 def find_phase(list, team, phase):
     actions = []
     for o in list:
         if o.get('team') == team: 
             for a in o.get('actions'):
-                if (a.get('phase') == phase) & (a.get('amplified') == True):
+                if (a.get('phase') == phase):
                     actions.append(a)
-    return actions
-
-
-
-print(find_phase(team_actions, 1710, 'teleOp'))
-    
+    return actions 
 
 # data = pd.read_csv('finalized_combined.csv')
 
