@@ -41,17 +41,16 @@ for t in team_actions:
     trap = 0
     for i in t.get('actions').get('teleOp'):
         if i.get('action') == 'intake':
-            match i.get('location'):
-                case 'source':
-                    source += 1
-                case 'speaker':
-                    speaker += 1
-                case 'center':
-                    center += 1
-                case 'amp':
-                    amp += 1
-                case 'trap':
-                    trap += 1
+            if i.get('location') == 'source':
+                source += 1
+            elif i.get('location') == 'speaker':
+                speaker += 1
+            elif i.get('location') == 'center':
+                center += 1
+            elif i.get('location') == 'amp':
+                amp += 1
+            elif i.get('location') == 'trap':
+                trap += 1
     team_intake_prev.append({'team': t.get('team'), 'source': source, 'speaker': speaker, 'center': center, 'amp': amp, 'trap': trap})
 
 team_intake = []
@@ -75,14 +74,14 @@ for t in team_actions:
                 print(prev_action)
                 print(' ')
                 if prev_action.get('time') - i.get('time') > 5:
-                    match i.get('location'):
-                        case 'speaker':
+                    if i.get('action') == 'intake':
+                        if i.get('location') == 'speaker':
                             speaker += 1
-                        case 'center':
+                        elif i.get('location') == 'center':
                             center += 1
-                        case 'amp':
+                        elif i.get('location') == 'amp':
                             amp += 1
-                        case 'trap':
+                        elif i.get('location') == 'trap':
                             trap += 1
     team_intake.append({'team': t.get('team'), 'source': source, 'speaker': speaker, 'center': center, 'amp': amp, 'trap': trap})
 
