@@ -2,3 +2,6 @@ pandas==2.0.3
 seaborn==0.13.2
 requests==2.23.3
 python-dotenv==1.0.1
+torch==2.4.1
+torchvision==0.19.1
+torchaudio==2.4.1
