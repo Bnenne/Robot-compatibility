@@ -1,7 +1,6 @@
 def create_files():
     from functions.team_actions import actions
-    import json
-    import csv
+    import json, csv
 
     team_intake_prev = []
 
