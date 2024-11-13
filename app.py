@@ -1,7 +1,7 @@
 import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
-from library.intake_locations import create_files
+from functions.intake_locations import create_files
 
 create_files()
 
