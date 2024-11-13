@@ -13,8 +13,17 @@ def get_start_red(event_keys, team_key):
     for e in data:
         if e['alliance'] == 'red':
             starts.append(e['pregame']['startPosition'])
-
-    return(starts)
+    print(starts)
+    for p in starts:
+        x = p.get('x')
+        if x > 50:
+            p['x'] = 50 - (x - 50)
+        elif x < 50:
+            p['x'] = 50 + (50 - x)
+        elif x == 50:
+            p['x'] = 50
+    print(starts)
+    return starts
 
 def get_start_blue(event_keys, team_key):
     import requests
@@ -32,4 +41,4 @@ def get_start_blue(event_keys, team_key):
         if e['alliance'] == 'blue':
             starts.append(e['pregame']['startPosition'])
 
-    return(starts)
+    return starts
