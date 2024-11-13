@@ -2,6 +2,7 @@ import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
 from functions.intake_locations import create_files
+from functions.cluster_labeling import scatter_plot
 
 create_files()
 
