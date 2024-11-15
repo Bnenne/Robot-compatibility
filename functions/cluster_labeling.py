@@ -3,88 +3,77 @@ import seaborn as sns
 import numpy as np
 import matplotlib.pyplot as plt
 from sklearn.cluster import DBSCAN
-from scouting_api import ScoutingAPI
+from functions.scouting_api import ScoutingAPI
 
-event_keys = ['2024ksla', '2024wila', '2024dal', '2024cttd']
-team_key = '1710'
+def return_graph(event_key, team_key):
+    sa = ScoutingAPI(event_key, team_key)
 
-# event_keys = ['2024oktu', '2024ksla', '2024mokc', '2024mil', '2024mksc']
-# team_key = '1730'
+    points_red = sa.get_start_red()
+    points_blue = sa.get_start_blue()
 
-# event_keys = ['2024ksla', '2024ilch', '2024dal', '2024mksc', '2024cttd']
-# team_key = '1986'
+    points = []
 
-sa = ScoutingAPI(event_keys, team_key)
+    for p in points_red:
+        points.append(p)
 
-points_red = sa.get_start_red()
-points_blue = sa.get_start_blue()
+    for p in points_blue:
+        points.append(p)
 
-points = []
+    points_formatted = []
+    points_formatted_to_label = []
 
-for p in points_red:
-    points.append(p)
+    for p in points:
+        points_formatted_to_label.append([p['x'], p['y']])
+        points_formatted.append([p['x'], p['y'], p['strat']])
 
-for p in points_blue:
-    points.append(p)
+    eps = 25
+    min_samples = 1
 
-points_formatted = []
-points_formatted_to_label = []
+    db = DBSCAN(eps=eps, min_samples=min_samples)
+    db.fit(points_formatted_to_label)
 
-for p in points:
-    points_formatted_to_label.append([p['x'], p['y']])
-    points_formatted.append([p['x'], p['y'], p['strat']])
+    df = pd.DataFrame(points_formatted, columns=["x", "y", "strat"])
 
-eps = 25
-min_samples = 1
+    sns.set_theme(style='whitegrid')
 
-db = DBSCAN(eps=eps, min_samples=min_samples)
-db.fit(points_formatted_to_label)
+    img_blue = plt.imread('functions/assets/starting_map.png')
 
-df = pd.DataFrame(points_formatted, columns=["x", "y", "strat"])
+    df_copy = df
+    df_copy['label'] = db.labels_
 
-sns.set_theme(style='whitegrid')
+    print(df)
+    print(df_copy)
 
-img_blue = plt.imread('assets/starting_map.png')
+    labels_array = np.array(db.labels_)
 
-df_copy = df
-df_copy['label'] = db.labels_
+    unique_labels = np.unique(labels_array)
 
-print(df)
-print(df_copy)
+    if len(unique_labels) > 3:
+        unique_labels, counts = np.unique(labels_array, return_counts=True)
+        single_occurrence_labels = unique_labels[counts == 1]
 
-labels_array = np.array(db.labels_)
+        mask = ~np.isin(labels_array, single_occurrence_labels)
+        filtered_labels = labels_array[mask]
 
-unique_labels = np.unique(labels_array)
+        unique_labels = df_copy['label'].value_counts()
+        single_labels = unique_labels[unique_labels == 1].index
 
-if len(unique_labels) > 3:
-    unique_labels, counts = np.unique(labels_array, return_counts=True)
-    single_occurrence_labels = unique_labels[counts == 1]
+        df_filtered = df_copy[~df_copy['label'].isin(single_labels)]
+    else:
+        filtered_labels = labels_array
+        df_filtered = df_copy
 
-    mask = ~np.isin(labels_array, single_occurrence_labels)
-    filtered_labels = labels_array[mask]
+    sns.scatterplot(data=df_filtered, x='x', y='y', hue=filtered_labels, palette='CMRmap', size='strat')
+    plt.xlabel("X")
+    plt.ylabel("Y")
+    plt.ylim(0, 250)
+    plt.xlim(0, 100)
+    plt.imshow(img_blue, extent=[0, 100, 0, 250])
 
-    unique_labels = df_copy['label'].value_counts()
-    single_labels = unique_labels[unique_labels == 1].index
+    title = event_key[0] + team_key
 
-    df_filtered = df_copy[~df_copy['label'].isin(single_labels)]
-else:
-    filtered_labels = labels_array
-    df_filtered = df_copy
+    plt.suptitle(title)
+    plt.tight_layout()
+    # plt.show()
 
-sns.scatterplot(data=df_filtered, x='x', y='y', hue=filtered_labels, palette='CMRmap', size='strat', legend=None)
-plt.xlabel("X")
-plt.ylabel("Y")
-plt.ylim(0, 250)
-plt.xlim(0, 100)
-plt.imshow(img_blue, extent=[0, 100, 0, 250])
-
-keys = ''
-
-for e in event_keys:
-    keys = keys + e + ' '
-
-title = keys + team_key + ' ' + str(eps)
-
-plt.suptitle(title)
-plt.tight_layout()
-plt.show()
+    return df_filtered.to_dict()
