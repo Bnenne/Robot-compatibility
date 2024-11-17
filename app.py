@@ -32,8 +32,9 @@
 
 # plt.show()
 
-from flask import Flask, jsonify
-from functions.cluster_labeling import return_graph
+from flask import Flask, jsonify, send_file
+from functions.cluster_labeling import return_graph, return_data
+import json
 
 # create_files()
   
@@ -41,7 +42,11 @@ app = Flask(__name__)
 
 @app.route("/graph/<event>/<team>", methods=['GET']) 
 def get_graph(event, team):
-    return return_graph([event], team), 200
+    return send_file(return_graph([event], team), mimetype='image/jpeg'), 200
+
+@app.route("/data/<event>/<team>", methods=['GET'])
+def get_data(event, team):
+    return return_data([event], team), 200
   
 if __name__ == "__main__": 
     app.run(debug=True)
