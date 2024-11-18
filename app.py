@@ -42,7 +42,7 @@ app = Flask(__name__)
 
 @app.route("/graph/<event>/<team>", methods=['GET']) 
 def get_graph(event, team):
-    return send_file(return_graph([event], team), mimetype='image/jpeg'), 200
+    return send_file(return_graph([event], team), mimetype='image/png'), 200
 
 @app.route("/data/<event>/<team>", methods=['GET'])
 def get_data(event, team):

@@ -80,6 +80,7 @@ def return_graph(event_key, team_key):
     buf = io.BytesIO()
     plt.savefig(buf, format='png')
     buf.seek(0)
+    plt.close()
 
     return buf
 
