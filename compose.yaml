@@ -4,3 +4,5 @@ services:
       context: .
     ports:
       - 5001:5000
+    environment:
+      - API_KEY=KBgtYZnVwKD4chpB2BkMxKbeyP00EijOvetrzzbporPZzs2ED1hAN7ceeTRnCui6
