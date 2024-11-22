@@ -31,8 +31,8 @@ class ScoutingAPI:
 
         # with open('data.json', 'r') as f:
         #     data = json.load(f)
-        #
-        # starts = []
+
+        starts = []
 
         for e in data:
             if e['alliance'] == 'red':
@@ -70,8 +70,8 @@ class ScoutingAPI:
 
         # with open('data.json', 'r') as f:
         #     data = json.load(f)
-        #
-        # starts = []
+
+        starts = []
 
         for e in data:
             if e['alliance'] == 'blue':
