@@ -33,7 +33,7 @@
 # plt.show()
 
 from flask import Flask, jsonify, send_file
-from functions.cluster_labeling import return_graph, return_data
+from functions.cluster_labeling import DataLabeling
 import json
 
 # create_files()
@@ -42,11 +42,13 @@ app = Flask(__name__)
 
 @app.route("/graph/<event>/<team>", methods=['GET']) 
 def get_graph(event, team):
-    return send_file(return_graph([event], team), mimetype='image/png'), 200
+    dl = DataLabeling(event, team)
+    return send_file(dl.return_graph(), mimetype='image/png'), 200
 
 @app.route("/data/<event>/<team>", methods=['GET'])
 def get_data(event, team):
-    return return_data([event], team), 200
+    dl = DataLabeling(event, team)
+    return dl.return_data(), 200
   
 if __name__ == "__main__": 
     app.run(debug=True)
