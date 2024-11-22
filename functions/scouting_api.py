@@ -1,4 +1,4 @@
-import requests, os
+import requests, os, json
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -21,39 +21,33 @@ class ScoutingAPI:
         print(event_key)
         print(self.event_key)
 
-    def auto_strat(self, positions, data):
-
-        strat = []
-
-        for p in positions:
-            stratLabel = 0
-            autoActions = False
-            for d in data:
-                if p == d['pregame']['startPosition']:
-                    if d['game']['untimed']['exitAuto']:
-                        stratLabel += 1
-                        for e in d['game']['actions']:
-                            if e.get('phase') == 'auto':
-                                autoActions = True
-                        if autoActions:
-                            stratLabel += 1
-            strat.append({'x': p.get('x'), 'y': p.get('y'), 'strat': stratLabel})
-
-        return strat
-
     def get_start_red(self):
         data = []
-            
+
         for key in self.event_key:
             r = requests.get('http://team1710scouting.vercel.app/api/'+key+'/frc'+self.team_key)
             for e in r.json():
                 data.append(e)
 
-        starts = []
+        # with open('data.json', 'r') as f:
+        #     data = json.load(f)
+        #
+        # starts = []
 
         for e in data:
             if e['alliance'] == 'red':
-                starts.append(e['pregame']['startPosition'])
+                strat_label = 0
+                auto_actions = False
+                if e['game']['untimed']['exitAuto']:
+                    strat_label += 1
+                    for d in e['game']['actions']:
+                        if d.get('phase') == 'auto':
+                            auto_actions = True
+                    if auto_actions:
+                        strat_label += 1
+                starts.append({'x': e['pregame']['startPosition']['x'], 'y': e['pregame']['startPosition']['y'], 'strat': strat_label})
+
+        print(starts)
 
         for p in starts:
             x = p.get('x')
@@ -64,8 +58,7 @@ class ScoutingAPI:
             elif x == 50:
                 p['x'] = 50
 
-        return self.auto_strat(starts, data)
-        # return starts
+        return starts
 
     def get_start_blue(self):
         data = []
@@ -75,56 +68,24 @@ class ScoutingAPI:
             for e in r.json():
                 data.append(e)
 
-        starts = []
+        # with open('data.json', 'r') as f:
+        #     data = json.load(f)
+        #
+        # starts = []
 
         for e in data:
             if e['alliance'] == 'blue':
-                starts.append(e['pregame']['startPosition'])
+                strat_label = 0
+                auto_actions = False
+                if e['game']['untimed']['exitAuto']:
+                    strat_label += 1
+                    for d in e['game']['actions']:
+                        if d.get('phase') == 'auto':
+                            auto_actions = True
+                    if auto_actions:
+                        strat_label += 1
+                starts.append({'x': e['pregame']['startPosition']['x'], 'y': e['pregame']['startPosition']['y'], 'strat': strat_label})
 
-        return self.auto_strat(starts, data)
-        # return starts
+        print(starts)
 
-
-# def get_start_red(event_keys, team_key):
-#
-#     data = []
-#
-#     for key in event_keys:
-#         r = requests.get('http://team1710scouting.vercel.app/api/'+key+'/frc'+team_key)
-#         for e in r.json():
-#             data.append(e)
-#
-#     starts = []
-#
-#     for e in data:
-#         if e['alliance'] == 'red':
-#             starts.append(e['pregame']['startPosition'])
-#     print(starts)
-#     for p in starts:
-#         x = p.get('x')
-#         if x > 50:
-#             p['x'] = 50 - (x - 50)
-#         elif x < 50:
-#             p['x'] = 50 + (50 - x)
-#         elif x == 50:
-#             p['x'] = 50
-#     print(starts)
-#     return starts
-#
-# def get_start_blue(event_keys, team_key):
-#     import requests
-#
-#     data = []
-#
-#     for key in event_keys:
-#         r = requests.get('http://team1710scouting.vercel.app/api/'+key+'/frc'+team_key)
-#         for e in r.json():
-#             data.append(e)
-#
-#     starts = []
-#
-#     for e in data:
-#         if e['alliance'] == 'blue':
-#             starts.append(e['pregame']['startPosition'])
-#
-#     return starts
+        return starts
