@@ -17,7 +17,7 @@ Currently, the project has two routes:\
 Graph returns a graph formatted on the 2024 FRC game blue alliance starting zone.\
 Data returns the data as a dictionary.
 
-The routes only work for teams that have been scouting by Team 1710 and at competitions that Team 1710 has scouted at.\
+The routes only work for teams that have been scouting by Team 1710 and at competitions that Team 1710 has been to.\
 If you put "events" for {event}, data for every competition that that team has been to in 2024 that 1710 has scouted will be returned.
 
 Try visiting https://micro.apisb.me/graph/events/1710 \
