@@ -12,7 +12,7 @@ class ScoutingAPI:
         self.event_key = []
         self.team_key = team_key
         if 'events' in event_key:
-            events = requests.get('https://www.thebluealliance.com/api/v3/team/frc'+team_key+'/events/2024/simple?X-TBA-Auth-Key='+api_key)
+            events = requests.get('https://www.thebluealliance.com/api/v3/team/'+team_key+'/events/2024/simple?X-TBA-Auth-Key='+api_key)
             print(events.json())
             for event in events.json():
                 self.event_key.append(event.get("key"))
@@ -21,14 +21,16 @@ class ScoutingAPI:
         print(event_key)
         print(self.event_key)
 
-    def get_start_red(self):
-        data = []
+        self.data = []
 
         for key in self.event_key:
-            r = requests.get('http://team1710scouting.vercel.app/api/'+key+'/frc'+self.team_key)
+            r = requests.get('http://team1710scouting.vercel.app/api/'+key+'/'+self.team_key)
             for e in r.json():
                 data.append(e)
 
+        pass
+
+    def get_start_red(self):
         # with open('data.json', 'r') as f:
         #     data = json.load(f)
 
@@ -48,13 +50,6 @@ class ScoutingAPI:
         return starts
 
     def get_start_blue(self):
-        data = []
-
-        for key in self.event_key:
-            r = requests.get('http://team1710scouting.vercel.app/api/'+key+'/frc'+self.team_key)
-            for e in r.json():
-                data.append(e)
-
         # with open('data.json', 'r') as f:
         #     data = json.load(f)
 
@@ -68,17 +63,29 @@ class ScoutingAPI:
         starts = []
 
         for e in data:
+            # strat_label = 0
+            auto_actions = []
+            auto_score = 0
             if e['alliance'] == color:
-                strat_label = 0
-                auto_actions = []
                 for d in e['game']['actions']:
                     if d.get('phase') == 'auto':
                         auto_actions.append(d)
-                if len(auto_actions) > 0:
-                    strat_label += 1
-                if len(auto_actions) > 1:
-                    strat_label += 1
-                starts.append({'x': e['pregame']['startPosition']['x'], 'y': e['pregame']['startPosition']['y'],
-                               'strat': strat_label})
+                # if len(auto_actions) > 0:
+                #     strat_label += 1
+                # if len(auto_actions) > 1:
+                #     strat_label += 1
+                for a in auto_actions:
+                    if a.get('action') == 'score':
+                        auto_score += 1
+                # print(auto_actions)
+                # print(auto_score)
+                starts.append(
+                    {
+                    'x': e['pregame']['startPosition']['x'],
+                    'y': e['pregame']['startPosition']['y'],
+                    # 'strat': strat_label,
+                    'auto_score': auto_score,
+                    }
+                )
 
         return starts

@@ -28,7 +28,12 @@ class DataLabeling:
 
         for p in points:
             points_formatted_to_label.append([p['x'], p['y']])
-            points_formatted.append([p['x'], p['y'], p['strat']])
+            points_formatted.append([
+                p['x'],
+                p['y'],
+                # p['strat'],
+                p['auto_score']
+            ])
 
         eps = 25
         min_samples = 1
@@ -36,7 +41,13 @@ class DataLabeling:
         db = DBSCAN(eps=eps, min_samples=min_samples)
         db.fit(points_formatted_to_label)
 
-        df = pd.DataFrame(points_formatted, columns=["x", "y", "strat"])
+        df = pd.DataFrame(points_formatted,
+                          columns=[
+                              "x",
+                              "y",
+                              # "strat",
+                              "auto_score"
+                          ])
 
         sns.set_theme(style='whitegrid')
 
@@ -69,14 +80,22 @@ class DataLabeling:
         self.labels = filtered_labels
         self.df = df_filtered
     def return_graph(self):
-        sns.scatterplot(data=self.df, x='x', y='y', hue=self.labels, palette='CMRmap', size='strat')
+        sns.scatterplot(
+            data=self.df,
+            x='x',
+            y='y',
+            hue=self.labels,
+            palette='CMRmap',
+            size='auto_score',
+            legend=False
+        )
         plt.xlabel("X")
         plt.ylabel("Y")
         plt.ylim(0, 250)
         plt.xlim(0, 100)
         plt.imshow(self.img_blue, extent=[0, 100, 0, 250])
 
-        title = self.event_key + self.team_key
+        title = self.event_key + " " + self.team_key
 
         plt.suptitle(title)
         plt.tight_layout()
