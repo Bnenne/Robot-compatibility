@@ -11,14 +11,14 @@ or to have data returned try this:\
 https://micro.apisb.me/graph/events/1710
 
 Currently, the project has two routes:\
-"/graph/<event>/<team>" \
-"/data/<event>/<team>"
+/graph/{event}/{team} \
+/data/{event}/{team}
 
 Graph returns a graph formatted on the 2024 FRC game blue alliance starting zone.\
 Data returns the data as a dictionary.
 
 The routes only work for teams that have been scouting by Team 1710 and at competitions that Team 1710 has scouted at.\
-If you put "events" for <event>, data for every competition that that team has been to in 2024 that 1710 has scouted will be returned.\
+If you put "events" for {event}, data for every competition that that team has been to in 2024 that 1710 has scouted will be returned.
 
 Try visiting https://micro.apisb.me/graph/events/1710 \
 You should get a graph like this:\
