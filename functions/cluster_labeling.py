@@ -56,8 +56,8 @@ class DataLabeling:
         df_copy = df
         df_copy['label'] = db.labels_
 
-        print(df)
-        print(df_copy)
+        # print(df)
+        # print(df_copy)
 
         labels_array = np.array(db.labels_)
 
@@ -79,7 +79,48 @@ class DataLabeling:
             df_filtered = df_copy
         self.labels = filtered_labels
         self.df = df_filtered
+
+        self.labels_single = {item["label"] for item in self.df.to_dict(orient='records')}
+
+        self.labels_single = list(self.labels_single)
+
+        self.grouped_labels = []
+
+        for l in self.labels_single:
+            self.grouped_labels.append({'label': int(l), 'points': []})
+
+        self.masses = []
+
+        for l in self.grouped_labels:
+            x = 0
+            y = 0
+            auto_score = 0
+            sample = 0
+            for a in self.df.to_dict(orient='records'):
+                if a['label'] == l['label']:
+                    l['points'].append(a)
+            for e in l['points']:
+                sample += 1
+                x += e['x']
+                y += e['y']
+                auto_score += e['auto_score']
+            x_mass = x/sample
+            y_mass = y/sample
+            auto_mass = auto_score/sample
+            self.masses.append({'x': x_mass, 'y': y_mass, 'auto_score': auto_mass, 'label': l['label']})
+
+        self.df_masses = pd.DataFrame(self.masses,
+                          columns=[
+                              "x",
+                              "y",
+                              "auto_score",
+                              "label"
+                          ])
+
+        # print(self.df_masses)
     def return_graph(self):
+        fig, axes = plt.subplots(1, 2)
+
         sns.scatterplot(
             data=self.df,
             x='x',
@@ -87,8 +128,26 @@ class DataLabeling:
             hue=self.labels,
             palette='CMRmap',
             size='auto_score',
-            legend=False
+            legend=False,
+            ax=axes[0]
         )
+        # plt.xlabel("X")
+        # plt.ylabel("Y")
+        # plt.ylim(0, 250)
+        # plt.xlim(0, 100)
+        # plt.imshow(self.img_blue, extent=[0, 100, 0, 250])
+
+        sns.scatterplot(
+            data=self.df_masses,
+            x='x',
+            y='y',
+            hue='label',
+            palette='CMRmap',
+            size='auto_score',
+            legend=False,
+            ax=axes[1]
+        )
+
         plt.xlabel("X")
         plt.ylabel("Y")
         plt.ylim(0, 250)
@@ -108,4 +167,4 @@ class DataLabeling:
 
         return buf
     def return_data(self):
-        return self.df.to_dict()
+        return {'general': self.df.to_dict(), 'masses': self.df_masses.to_dict()}

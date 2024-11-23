@@ -48,7 +48,7 @@ def get_graph(event, team):
 @app.route("/data/<event>/<team>", methods=['GET'])
 def get_data(event, team):
     dl = DataLabeling(event, team)
-    return dl.return_data(), 200
+    return jsonify(dl.return_data()), 200
   
 if __name__ == "__main__": 
     app.run(debug=True)
