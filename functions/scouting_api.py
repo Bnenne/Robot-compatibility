@@ -32,20 +32,7 @@ class ScoutingAPI:
         # with open('data.json', 'r') as f:
         #     data = json.load(f)
 
-        starts = []
-
-        for e in data:
-            if e['alliance'] == 'red':
-                strat_label = 0
-                auto_actions = False
-                if e['game']['untimed']['exitAuto']:
-                    strat_label += 1
-                    for d in e['game']['actions']:
-                        if d.get('phase') == 'auto':
-                            auto_actions = True
-                    if auto_actions:
-                        strat_label += 1
-                starts.append({'x': e['pregame']['startPosition']['x'], 'y': e['pregame']['startPosition']['y'], 'strat': strat_label})
+        starts = self.starts('red', data)
 
         print(starts)
 
@@ -71,21 +58,27 @@ class ScoutingAPI:
         # with open('data.json', 'r') as f:
         #     data = json.load(f)
 
+        starts = self.starts('blue', data)
+
+        print(starts)
+
+        return starts
+
+    def starts(self, color, data):
         starts = []
 
         for e in data:
-            if e['alliance'] == 'blue':
+            if e['alliance'] == color:
                 strat_label = 0
-                auto_actions = False
-                if e['game']['untimed']['exitAuto']:
+                auto_actions = []
+                for d in e['game']['actions']:
+                    if d.get('phase') == 'auto':
+                        auto_actions.append(d)
+                if len(auto_actions) > 0:
                     strat_label += 1
-                    for d in e['game']['actions']:
-                        if d.get('phase') == 'auto':
-                            auto_actions = True
-                    if auto_actions:
-                        strat_label += 1
-                starts.append({'x': e['pregame']['startPosition']['x'], 'y': e['pregame']['startPosition']['y'], 'strat': strat_label})
-
-        print(starts)
+                if len(auto_actions) > 1:
+                    strat_label += 1
+                starts.append({'x': e['pregame']['startPosition']['x'], 'y': e['pregame']['startPosition']['y'],
+                               'strat': strat_label})
 
         return starts
