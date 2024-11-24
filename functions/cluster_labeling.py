@@ -131,11 +131,11 @@ class DataLabeling:
             legend=False,
             ax=axes[0]
         )
-        # plt.xlabel("X")
-        # plt.ylabel("Y")
-        # plt.ylim(0, 250)
-        # plt.xlim(0, 100)
-        # plt.imshow(self.img_blue, extent=[0, 100, 0, 250])
+        axes[0].set_xlabel("X")
+        axes[0].set_ylabel("Y")
+        axes[0].set_xlim(0, 100)
+        axes[0].set_ylim(0, 250)
+        axes[0].imshow(self.img_blue, extent=[0, 100, 0, 250])
 
         sns.scatterplot(
             data=self.df_masses,
@@ -148,11 +148,11 @@ class DataLabeling:
             ax=axes[1]
         )
 
-        plt.xlabel("X")
-        plt.ylabel("Y")
-        plt.ylim(0, 250)
-        plt.xlim(0, 100)
-        plt.imshow(self.img_blue, extent=[0, 100, 0, 250])
+        axes[1].set_xlabel("X")
+        axes[1].set_ylabel("Y")
+        axes[1].set_xlim(0, 100)
+        axes[1].set_ylim(0, 250)
+        axes[1].imshow(self.img_blue, extent=[0, 100, 0, 250])
 
         title = self.event_key + " " + self.team_key
 
