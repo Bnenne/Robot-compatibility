@@ -1,6 +1,6 @@
 This is a python program created by a member of the Informatics Subteam on FRC Team 1710.\
 The goal of this project is to create a program that can determine how compatible two robots are.\
-However, this project is a *WORK IN PROGRESS* and does *NOT* determine robot compatibility yet.\
+However, this project is a **WORK IN PROGRESS** and does **NOT** determine robot compatibility yet.\
 All data used in this project is taken from:\
 Statbotics (https://www.statbotics.io/) \
 The Blue Alliance (https://www.thebluealliance.com/) \
