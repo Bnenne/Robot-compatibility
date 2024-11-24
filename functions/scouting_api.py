@@ -9,32 +9,32 @@ api_key = os.getenv("API_KEY")
 
 class ScoutingAPI:
     def __init__(self, event_key, team_key):
-        # self.event_key = []
-        # self.team_key = team_key
-        # if 'events' in event_key:
-        #     events = requests.get('https://www.thebluealliance.com/api/v3/team/'+team_key+'/events/2024/simple?X-TBA-Auth-Key='+api_key)
-        #     print(events.json())
-        #     for event in events.json():
-        #         self.event_key.append(event.get("key"))
-        # else:
-        #     self.event_key = event_key
-        # print(event_key)
-        # print(self.event_key)
-        #
-        # self.data = []
-        #
-        # for key in self.event_key:
-        #     r = requests.get('http://team1710scouting.vercel.app/api/'+key+'/'+self.team_key)
-        #     for e in r.json():
-        #         data.append(e)
+        self.event_key = []
+        self.team_key = team_key
+        if 'events' in event_key:
+            events = requests.get('https://www.thebluealliance.com/api/v3/team/'+team_key+'/events/2024/simple?X-TBA-Auth-Key='+api_key)
+            print(events.json())
+            for event in events.json():
+                self.event_key.append(event.get("key"))
+        else:
+            self.event_key = event_key
+        print(event_key)
+        print(self.event_key)
 
-        pass
+        self.data = []
+
+        for key in self.event_key:
+            r = requests.get('http://team1710scouting.vercel.app/api/'+key+'/'+self.team_key)
+            for e in r.json():
+                self.data.append(e)
+
+        # pass
 
     def get_start_red(self):
-        with open('data.json', 'r') as f:
-            data = json.load(f)
+        # with open('data.json', 'r') as f:
+        #     data = json.load(f)
 
-        starts = self.starts('red', data)
+        starts = self.starts('red', self.data)
 
         print(starts)
 
@@ -50,10 +50,10 @@ class ScoutingAPI:
         return starts
 
     def get_start_blue(self):
-        with open('data.json', 'r') as f:
-            data = json.load(f)
+        # with open('data.json', 'r') as f:
+        #     data = json.load(f)
 
-        starts = self.starts('blue', data)
+        starts = self.starts('blue', self.data)
 
         print(starts)
 
