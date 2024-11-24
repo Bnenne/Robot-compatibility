@@ -13,7 +13,7 @@ class ScoutingAPI:
             for event in events.json():
                 self.event_key.append(event.get("key"))
         else:
-            self.event_key = event_key
+            self.event_key.append(event_key)
         print(event_key)
         print(self.event_key)
 
