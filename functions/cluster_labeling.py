@@ -10,7 +10,7 @@ class DataLabeling:
     def __init__(self, event_key, team_key):
         self.event_key = event_key
         self.team_key = team_key
-        sa = ScoutingAPI(event_key, team_key)
+        sa = ScoutingAPI(self.event_key, self.team_key)
 
         points_red = sa.get_start_red()
         points_blue = sa.get_start_blue()
@@ -31,7 +31,6 @@ class DataLabeling:
             points_formatted.append([
                 p['x'],
                 p['y'],
-                # p['strat'],
                 p['auto_score']
             ])
 
@@ -45,7 +44,6 @@ class DataLabeling:
                           columns=[
                               "x",
                               "y",
-                              # "strat",
                               "auto_score"
                           ])
 
@@ -55,9 +53,6 @@ class DataLabeling:
 
         df_copy = df
         df_copy['label'] = db.labels_
-
-        # print(df)
-        # print(df_copy)
 
         labels_array = np.array(db.labels_)
 
@@ -80,18 +75,18 @@ class DataLabeling:
         self.labels = filtered_labels
         self.df = df_filtered
 
-        self.labels_single = {item["label"] for item in self.df.to_dict(orient='records')}
+        labels_single = {item["label"] for item in self.df.to_dict(orient='records')}
 
-        self.labels_single = list(self.labels_single)
+        labels_single = list(labels_single)
 
-        self.grouped_labels = []
+        grouped_labels = []
 
-        for l in self.labels_single:
-            self.grouped_labels.append({'label': int(l), 'points': []})
+        for l in labels_single:
+            grouped_labels.append({'label': int(l), 'points': []})
 
-        self.masses = []
+        masses = []
 
-        for l in self.grouped_labels:
+        for l in grouped_labels:
             x = 0
             y = 0
             auto_score = 0
@@ -107,9 +102,9 @@ class DataLabeling:
             x_mass = x/sample
             y_mass = y/sample
             auto_mass = auto_score/sample
-            self.masses.append({'x': x_mass, 'y': y_mass, 'auto_score': auto_mass, 'label': l['label']})
+            masses.append({'x': x_mass, 'y': y_mass, 'auto_score': auto_mass, 'label': l['label']})
 
-        self.df_masses = pd.DataFrame(self.masses,
+        self.df_masses = pd.DataFrame(masses,
                           columns=[
                               "x",
                               "y",

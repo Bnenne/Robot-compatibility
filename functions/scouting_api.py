@@ -1,18 +1,14 @@
 import requests, os, json
 from dotenv import load_dotenv
 
-load_dotenv()
-
-api_key = os.getenv("API_KEY")
-
-# teams = requests.get('https://www.thebluealliance.com/api/v3/event/'+event_key+'/teams/simple?X-TBA-Auth-Key='+api_key)
-
 class ScoutingAPI:
     def __init__(self, event_key, team_key):
         self.event_key = []
         self.team_key = team_key
+        load_dotenv()
+        self.api_key = os.getenv("API_KEY")
         if 'events' in event_key:
-            events = requests.get('https://www.thebluealliance.com/api/v3/team/'+team_key+'/events/2024/simple?X-TBA-Auth-Key='+api_key)
+            events = requests.get('https://www.thebluealliance.com/api/v3/team/'+self.team_key+'/events/2024/simple?X-TBA-Auth-Key='+self.api_key)
             print(events.json())
             for event in events.json():
                 self.event_key.append(event.get("key"))
@@ -63,27 +59,19 @@ class ScoutingAPI:
         starts = []
 
         for e in data:
-            # strat_label = 0
             auto_actions = []
             auto_score = 0
             if e['alliance'] == color:
                 for d in e['game']['actions']:
                     if d.get('phase') == 'auto':
                         auto_actions.append(d)
-                # if len(auto_actions) > 0:
-                #     strat_label += 1
-                # if len(auto_actions) > 1:
-                #     strat_label += 1
                 for a in auto_actions:
                     if a.get('action') == 'score':
                         auto_score += 1
-                # print(auto_actions)
-                # print(auto_score)
                 starts.append(
                     {
                     'x': e['pregame']['startPosition']['x'],
                     'y': e['pregame']['startPosition']['y'],
-                    # 'strat': strat_label,
                     'auto_score': auto_score,
                     }
                 )
