@@ -111,10 +111,8 @@ class DataLabeling:
                               "auto_score",
                               "label"
                           ])
-
-        # print(self.df_masses)
-    def return_graph(self):
-        fig, axes = plt.subplots(1, 2)
+    def return_graph(self, title):
+        fig, axes = plt.subplots(1, 2, figsize=(6, 5))
 
         sns.scatterplot(
             data=self.df,
@@ -149,11 +147,8 @@ class DataLabeling:
         axes[1].set_ylim(0, 250)
         axes[1].imshow(self.img_blue, extent=[0, 100, 0, 250])
 
-        title = self.event_key + " " + self.team_key
-
         plt.suptitle(title)
         plt.tight_layout()
-        # plt.show()
 
         buf = io.BytesIO()
         plt.savefig(buf, format='png')
@@ -163,3 +158,83 @@ class DataLabeling:
         return buf
     def return_data(self):
         return {'general': self.df.to_dict(), 'masses': self.df_masses.to_dict()}
+
+class Compare:
+    def __init__(self, event_key, team_key):
+        self.event_key = event_key
+        self.team_key = team_key
+        self.img_blue = plt.imread('functions/assets/starting_map.png')
+    def return_compare_graph(self, title):
+        data = []
+
+        teams = ""
+
+        for t in self.team_key:
+            teams = teams + " " + t
+            dl = DataLabeling(self.event_key, t)
+            data.append(dl.return_data())
+
+        i = 0
+
+        team_length = len(self.team_key)
+
+        fig, axes = plt.subplots(1*team_length, 2, figsize=(6, 5*team_length))
+
+        for d in data:
+            general = pd.DataFrame(d['general'],
+                                   columns=[
+                                        "x",
+                                        "y",
+                                        "auto_score",
+                                        "label"
+                                    ])
+            masses = pd.DataFrame(d['masses'],
+                                   columns=[
+                                       "x",
+                                       "y",
+                                       "auto_score",
+                                       "label"
+                                   ])
+
+            sns.scatterplot(
+                data=general,
+                x='x',
+                y='y',
+                hue='label',
+                palette='CMRmap',
+                size='auto_score',
+                legend=False,
+                ax=axes[i, 0]
+            )
+            axes[i, 0].set_xlabel("X")
+            axes[i, 0].set_ylabel("Y")
+            axes[i, 0].set_xlim(0, 100)
+            axes[i, 0].set_ylim(0, 250)
+            axes[i, 0].imshow(self.img_blue, extent=[0, 100, 0, 250])
+
+            sns.scatterplot(
+                data=masses,
+                x='x',
+                y='y',
+                hue='label',
+                palette='CMRmap',
+                size='auto_score',
+                legend=False,
+                ax=axes[i, 1]
+            )
+            axes[i, 1].set_xlabel("X")
+            axes[i, 1].set_ylabel("Y")
+            axes[i, 1].set_xlim(0, 100)
+            axes[i, 1].set_ylim(0, 250)
+            axes[i, 1].imshow(self.img_blue, extent=[0, 100, 0, 250])
+            i += 1
+
+        plt.suptitle(title)
+        plt.tight_layout()
+
+        buf = io.BytesIO()
+        plt.savefig(buf, format='png')
+        buf.seek(0)
+        plt.close()
+
+        return buf
