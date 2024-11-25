@@ -7,7 +7,7 @@ The Blue Alliance (https://www.thebluealliance.com/) \
 
 ## Goal
 The goal of this project is to create a program that can determine how compatible two robots are.\
-However, this project is a **WORK IN PROGRESS** and does **NOT** determine robot compatibility yet.\
+However, this project is a **WORK IN PROGRESS** and does **NOT** determine robot compatibility yet.
 
 This project is intended to be used as an API route, but you can also just directly access it:\
 https://micro.apisb.me/graph/events/frc1710
@@ -21,10 +21,10 @@ Currently, the project has four routes:\
 
 /graph returns two graphs formatted on the 2024 FRC game blue alliance starting zone, one is every instance and the only shows the center of mass and average game pieces scored during the autonomous phase.\
 /data returns the data as a dictionary. \
-/compare/graph returns the same this as /graph but for every team in the url. I plan on adding two graphs that will give you insight on the teams' compatibility.
+/compare/graph returns the same as /graph but for every team in the url. I plan on adding two graphs that will give you insight on the teams' compatibility.
 
 The routes only work for teams that have been scouting by Team 1710 and at competitions that Team 1710 has scouted at.\
-If you put "events" for {event}, data for every competition that that team has been to in 2024 that 1710 has scouted will be returned./
+If you put "events" for {event}, data for every competition that that team has been to in 2024 that 1710 has scouted will be returned.\
 {event} should otherwise be the event ID formatted as the year followed by the event abbreviation (ex. 2024cttd), {team} should be formatted as "frc" followed by the team number (ex. frc1710).
 
 Try visiting https://micro.apisb.me/graph/events/frc1710 \
