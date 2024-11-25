@@ -29,12 +29,12 @@ If you put "events" for {event}, data for every competition that that team has b
 
 Try visiting https://micro.apisb.me/graph/events/frc1710 \
 You should get a graph like this:\
-![example graph1](https://cloud-2za8i7bzm-hack-club-bot.vercel.app/0frc1710.png)
+![example graph](https://cloud-2za8i7bzm-hack-club-bot.vercel.app/0frc1710.png)
 
 or
 
 Try visiting https://micro.apisb.me/compare/graph/events/frc1710/frc1730/frc1986 \
 You should get a graph like this:\
-![example graph2](https://cloud-2vrxksbnt-hack-club-bot.vercel.app/0frc_compare.png)
+![example graph](https://cloud-2vrxksbnt-hack-club-bot.vercel.app/0frc_compare.png)
 
 The different colored points represent starting position groupings and the different sizes represent how many points were scored during the auto period when they started at that point.
