@@ -119,7 +119,7 @@ class DataLabeling:
             x='x',
             y='y',
             hue=self.labels,
-            palette='CMRmap',
+            palette='BrBG',
             size='auto_score',
             legend=False,
             ax=axes[0]
@@ -135,7 +135,7 @@ class DataLabeling:
             x='x',
             y='y',
             hue='label',
-            palette='CMRmap',
+            palette='BrBG',
             size='auto_score',
             legend=False,
             ax=axes[1]
@@ -201,7 +201,7 @@ class Compare:
                 x='x',
                 y='y',
                 hue='label',
-                palette='CMRmap',
+                palette='BrBG',
                 size='auto_score',
                 legend=False,
                 ax=axes[i, 0]
@@ -217,7 +217,7 @@ class Compare:
                 x='x',
                 y='y',
                 hue='label',
-                palette='CMRmap',
+                palette='BrBG',
                 size='auto_score',
                 legend=False,
                 ax=axes[i, 1]
