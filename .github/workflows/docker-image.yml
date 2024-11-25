@@ -3,7 +3,7 @@ name: Build Docker Image
 on:
   push:
     branches:
-      - master   # Adjust branch as needed
+      - main   # Adjust branch as needed
 
 env:
   REGISTRY: ghcr.io
