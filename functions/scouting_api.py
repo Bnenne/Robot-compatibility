@@ -14,8 +14,6 @@ class ScoutingAPI:
                 self.event_key.append(event.get("key"))
         else:
             self.event_key.append(event_key)
-        print(event_key)
-        print(self.event_key)
 
         self.data = []
 
@@ -33,8 +31,6 @@ class ScoutingAPI:
 
         starts = self.starts('red', self.data)
 
-        print(starts)
-
         for p in starts:
             x = p.get('x')
             if x > 50:
@@ -51,8 +47,6 @@ class ScoutingAPI:
         #     self.data = json.load(f)
 
         starts = self.starts('blue', self.data)
-
-        print(starts)
 
         return starts
 
@@ -74,7 +68,9 @@ class ScoutingAPI:
                     'x': e['pregame']['startPosition']['x'],
                     'y': e['pregame']['startPosition']['y'],
                     'auto_score': auto_score,
+                    'team': e['team']
                     }
                 )
 
+        print(starts)
         return starts
