@@ -1,6 +1,6 @@
 from flask import Flask, jsonify, send_file
 from functions.cluster_labeling import DataLabeling, Compare
-from flask_cors import CORS, cross_origin
+from flask_cors import cross_origin
   
 app = Flask(__name__)
 

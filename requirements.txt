@@ -5,3 +5,4 @@ python-dotenv==1.0.1
 scikit-learn==1.5.2
 flask==3.0.3
 numpy==2.0.2
+flask_cors==5.0.0
