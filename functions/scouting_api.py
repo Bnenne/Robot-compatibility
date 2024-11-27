@@ -1,4 +1,4 @@
-import requests, os, json
+import requests, os
 from dotenv import load_dotenv
 
 class ScoutingAPI:
@@ -74,3 +74,8 @@ class ScoutingAPI:
 
         print(starts)
         return starts
+
+def return_scoutingapi():
+    events = requests.get('http://team1710scouting.vercel.app/api/key/event')
+    teams = requests.get('http://team1710scouting.vercel.app/api/key/team')
+    return {'events': events.json(), 'teams': teams.json()}

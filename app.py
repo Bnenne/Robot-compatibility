@@ -1,8 +1,14 @@
 from flask import Flask, jsonify, send_file
 from functions.cluster_labeling import DataLabeling, Compare
+from functions.scouting_api import return_scoutingapi
 from flask_cors import cross_origin
   
 app = Flask(__name__)
+
+@app.route("/scoutingapi", methods=['GET'])
+@cross_origin()
+def get_scoutingapi():
+    return jsonify(return_scoutingapi()), 200
 
 @app.route("/graph/<event>/<team>", methods=['GET'])
 @cross_origin()
