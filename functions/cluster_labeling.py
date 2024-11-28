@@ -2,9 +2,10 @@ import pandas as pd
 import seaborn as sns
 import numpy as np
 import matplotlib.pyplot as plt
-from sklearn.cluster import DBSCAN, KMeans, SpectralClustering, OPTICS
+from sklearn.cluster import DBSCAN, KMeans
 from functions.scouting_api import ScoutingAPI
 import io
+from itertools import combinations
 
 class DataLabeling:
     def __init__(self, event_key, team_key):
@@ -299,7 +300,78 @@ class Compare:
 
         combined_data['label'] = db.labels_.tolist()
 
-        print(combined_data)
+        teams_single = []
+
+        for e in combined_data.to_dict(orient='records'):
+            if e['team'] in teams_single:
+                pass
+            else:
+                teams_single.append(e['team'])
+
+        theoretical_max = 0
+        team_max = []
+
+        for t in teams_single:
+            highestAuto = 0
+            for e in combined_data.to_dict(orient='records'):
+                if e['team'] == t:
+                    if e['auto_score'] > highestAuto:
+                        highestAuto = e['auto_score']
+            theoretical_max += highestAuto
+            team_max.append({'team': t, 'max': highestAuto})
+
+        print(team_max)
+        print(theoretical_max)
+
+        print(combined_data.to_dict(orient='records'))
+
+        combination = combinations(combined_data.to_dict(orient='records'), len(teams_single))
+
+        valid_entries = []
+
+        for entry in combination:
+            teams_seen = set()
+            labels_seen = set()
+            is_valid = True
+            for dict_item in entry:
+                team = dict_item['team']
+                label = dict_item['label']
+
+                if team in teams_seen or label in labels_seen:
+                    is_valid = False
+                    break
+                teams_seen.add(team)
+                labels_seen.add(label)
+            if is_valid:
+                valid_entries.append(entry)
+
+        # Print the valid entries
+        for valid_entry in valid_entries:
+            print(valid_entry)
+
+        max = 0
+
+        for v in valid_entries:
+            if len(teams_single) == 2:
+                score = v[0]['auto_score'] + v[1]['auto_score']
+                if score > max:
+                    max = score
+            if len(teams_single) == 3:
+                score = v[0]['auto_score'] + v[1]['auto_score'] + v[2]['auto_score']
+                if score > max:
+                    max = score
+
+        print(max)
+
+        compatibility = (max/theoretical_max)*100
+
+        name = str(round(compatibility, 2)) + "%"
+
+        compatibility_data = {'name': name, 'compatibility': compatibility}
+
+        compatibility_data = pd.DataFrame(compatibility_data, index=[0])
+
+        print('compatibility_data', compatibility_data)
 
         sns.scatterplot(
             data=combined_data,
@@ -316,6 +388,17 @@ class Compare:
         axes[i, 0].set_xlim(0, 100)
         axes[i, 0].set_ylim(0, 250)
         axes[i, 0].imshow(self.img_blue, extent=[0, 100, 0, 250])
+
+        sns.barplot(
+            data=compatibility_data,
+            x='name',
+            y='compatibility',
+            legend=False,
+            ax=axes[i, 1]
+        )
+        axes[i, 1].set_xlabel("")
+        axes[i, 1].set_ylabel("Compatibility %")
+        axes[i, 1].set_ylim(0, 100)
 
         plt.suptitle(title)
         plt.tight_layout()
