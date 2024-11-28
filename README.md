@@ -7,34 +7,39 @@ The Blue Alliance (https://www.thebluealliance.com/) \
 
 ## Goal
 The goal of this project is to create a program that can determine how compatible two robots are.\
-However, this project is a **WORK IN PROGRESS** and does **NOT** determine robot compatibility yet.
+However, this project is a **WORK IN PROGRESS** and the current compatibility score **DOESN'T** reflect the entire compatibility truth.
 
-This project is intended to be used as an API route, but you can also just directly access it:\
+This project is intended to be used as an API route, but you can also use this frontend I created:\
 https://micro.apisb.me/graph/events/frc1710
 
 ## Use
-Currently, the project has four routes:\
-/graph/{event}/{team} \
-/data/{event}/{team} \
-/compare/graph/{event}/{team1}/{team2} \
-/compare/graph/{event}/{team1}/{team2}/{team3}
+Currently, the project has four routes with more to come:\
+/auto/graph/{event}/{team} \
+/auto/data/{event}/{team} \
+/auto/compare/graph/{event}/{team1}/{team2} \
+/auto/compare/graph/{event}/{team1}/{team2}/{team3}
 
 /graph returns two graphs formatted on the 2024 FRC game blue alliance starting zone, one is every instance and the only shows the center of mass and average game pieces scored during the autonomous phase.\
 /data returns the data as a dictionary. \
-/compare/graph returns the same as /graph but for every team in the url. I plan on adding two graphs that will give you insight on the teams' compatibility.
+/compare/graph returns the same as /graph but for every team in the url. It also displays a graph with all the teams massed points and a graph with a compatibility score.
 
 The routes only work for teams that have been scouting by Team 1710 and at competitions that Team 1710 has scouted at.\
 If you put "events" for {event}, data for every competition that that team has been to in 2024 that 1710 has scouted will be returned.\
 {event} should otherwise be the event ID formatted as the year followed by the event abbreviation (ex. 2024cttd), {team} should be formatted as "frc" followed by the team number (ex. frc1710).
 
-Try visiting https://micro.apisb.me/graph/events/frc1710 \
+## How it works
+The current approach calculates a theoretical maximum by summing the highest average game pieces scored across starting positions for the teams. It also calculates a realistic maximum by considering practical constraints, such as assigning one robot per position and not reusing the same team. \
+The compatibility score is the percentage of the theoretical maximum they're able to achieve with the realistic maximum.
+
+## Try it out
+Try visiting https://micro.apisb.me/auto/graph/events/frc1710 \
 You should get a graph like this:\
 ![example graph](https://cloud-2za8i7bzm-hack-club-bot.vercel.app/0frc1710.png)
 
-or
+### or
 
-Try visiting https://micro.apisb.me/compare/graph/events/frc1710/frc1730/frc1986 \
+Try visiting https://micro.apisb.me/auto/compare/graph/events/frc1710/frc1730/frc1986 \
 You should get a graph like this:\
-![example graph](https://cloud-2vrxksbnt-hack-club-bot.vercel.app/0frc_compare.png)
+![example graph](https://cloud-h2vbe2hdh-hack-club-bot.vercel.app/0image.png)
 
 The different colored points represent starting position groupings and the different sizes represent how many points were scored during the auto period when they started at that point.
