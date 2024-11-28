@@ -292,16 +292,20 @@ class Compare:
                 d['y']
             ])
 
-        eps = 25
+        eps = 40
         min_samples = 1
         db = DBSCAN(eps=eps, min_samples=min_samples)
         db.fit(to_label)
+
+        combined_data['label'] = db.labels_.tolist()
+
+        print(combined_data)
 
         sns.scatterplot(
             data=combined_data,
             x='x',
             y='y',
-            hue=db.labels_,
+            hue='label',
             palette='CMRmap',
             size='auto_score',
             legend=False,
