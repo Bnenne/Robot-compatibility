@@ -10,7 +10,7 @@ The goal of this project is to create a program that can determine how compatibl
 However, this project is a **WORK IN PROGRESS** and the current compatibility score **DOESN'T** reflect the entire compatibility truth.
 
 This project is intended to be used as an API route, but you can also use this frontend I created:\
-https://micro.apisb.me/graph/events/frc1710
+https://macro.apisb.me/
 
 ## Use
 Currently, the project has four routes with more to come:\
@@ -33,12 +33,16 @@ The compatibility score is the percentage of the theoretical maximum they're abl
 
 ## Try it out
 Try visiting https://micro.apisb.me/auto/graph/events/frc1710 \
+or **Auto** - **Graph** - **All 2024 Events** - **1710** via the front end \
+https://macro.apisb.me/ \
 You should get a graph like this:\
 ![example graph](https://cloud-2za8i7bzm-hack-club-bot.vercel.app/0frc1710.png)
 
 ### or
 
 Try visiting https://micro.apisb.me/auto/compare/graph/events/frc1710/frc1730/frc1986 \
+or **Auto** - **Compare** - **All 2024 Events** - **1710** - **1730** - **1986** via the front end \
+https://macro.apisb.me/ \
 You should get a graph like this:\
 ![example graph](https://cloud-h2vbe2hdh-hack-club-bot.vercel.app/0image.png)
 
