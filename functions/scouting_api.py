@@ -79,3 +79,9 @@ def return_scoutingapi():
     events = requests.get('http://team1710scouting.vercel.app/api/key/event')
     teams = requests.get('http://team1710scouting.vercel.app/api/key/team')
     return {'events': events.json(), 'teams': teams.json()}
+
+def return_tba():
+    load_dotenv()
+    api_key = os.getenv("API_KEY")
+    data = requests.get('https://www.thebluealliance.com/api/v3/events/2024/simple?X-TBA-Auth-Key='+api_key)
+    return data.json()
