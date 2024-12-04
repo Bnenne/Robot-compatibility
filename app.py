@@ -1,5 +1,5 @@
 from flask import Flask, jsonify, send_file
-from functions.cluster_labeling import DataLabeling, Compare
+from functions.auto_compatibility import DataLabeling, Compare
 from functions.scouting_api import return_scoutingapi, return_tba
 from flask_cors import cross_origin
   
@@ -43,6 +43,20 @@ def get_compare_graph3(event, team1, team2, team3):
     title = "/auto/compare/graph/" + event + "/" + team1 + "/" + team2 +"/" + team3
     compare = Compare(event, teams)
     return send_file(compare.return_compare_graph(title), mimetype='image/png'), 200
+
+@app.route("/auto/compare/data/<event>/<team1>/<team2>", methods=['GET'])
+@cross_origin()
+def get_compare_data2(event, team1, team2):
+    teams = [team1, team2]
+    compare = Compare(event, teams)
+    return jsonify(compare.return_compare_data()), 200
+
+@app.route("/auto/compare/data/<event>/<team1>/<team2>/<team3>", methods=['GET'])
+@cross_origin()
+def get_compare_data3(event, team1, team2, team3):
+    teams = [team1, team2, team3]
+    compare = Compare(event, teams)
+    return jsonify(compare.return_compare_data()), 200
   
 if __name__ == "__main__": 
     app.run(debug=True)

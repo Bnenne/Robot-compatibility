@@ -209,36 +209,140 @@ class Compare:
         self.event_key = event_key
         self.team_key = team_key
         self.img_blue = plt.imread('functions/assets/starting_map.png')
-    def return_compare_graph(self, title):
-        data = []
+
+        self.data = []
 
         teams = ""
 
         for t in self.team_key:
             teams = teams + " " + t
             dl = DataLabeling(self.event_key, t)
-            data.append(dl.return_data())
+            self.data.append(dl.return_data())
 
-        print(data)
+        print(self.data)
 
         i = 0
 
+        self.combined_data = None
+
+        for d in self.data:
+            masses = pd.DataFrame(d['masses'],
+                                  columns=[
+                                      "x",
+                                      "y",
+                                      "auto_score",
+                                      "team",
+                                      "label"
+                                  ])
+            if i == 0:
+                self.combined_data = masses
+            if i != 0:
+                self.combined_data = pd.concat([self.combined_data, masses])
+            i += 1
+
+        to_label = []
+        for d in self.combined_data.to_dict(orient='records'):
+            to_label.append([
+                d['x'],
+                d['y']
+            ])
+
+        eps = 40
+        min_samples = 1
+        db = DBSCAN(eps=eps, min_samples=min_samples)
+        db.fit(to_label)
+
+        self.combined_data['label'] = db.labels_.tolist()
+
+        teams_single = []
+
+        for e in self.combined_data.to_dict(orient='records'):
+            if e['team'] in teams_single:
+                pass
+            else:
+                teams_single.append(e['team'])
+
+        theoretical_max = 0
+        team_max = []
+
+        for t in teams_single:
+            highestAuto = 0
+            for e in self.combined_data.to_dict(orient='records'):
+                if e['team'] == t:
+                    if e['auto_score'] > highestAuto:
+                        highestAuto = e['auto_score']
+            theoretical_max += highestAuto
+            team_max.append({'team': t, 'max': highestAuto})
+
+        print(team_max)
+        print(theoretical_max)
+
+        print(self.combined_data.to_dict(orient='records'))
+
+        combination = combinations(self.combined_data.to_dict(orient='records'), len(teams_single))
+
+        valid_entries = []
+
+        for entry in combination:
+            teams_seen = set()
+            labels_seen = set()
+            is_valid = True
+            for dict_item in entry:
+                team = dict_item['team']
+                label = dict_item['label']
+
+                if team in teams_seen or label in labels_seen:
+                    is_valid = False
+                    break
+                teams_seen.add(team)
+                labels_seen.add(label)
+            if is_valid:
+                valid_entries.append(entry)
+
+        # Print the valid entries
+        for valid_entry in valid_entries:
+            print(valid_entry)
+
+        max = 0
+        self.maxPos = None
+
+        for v in valid_entries:
+            if len(teams_single) == 2:
+                score = v[0]['auto_score'] + v[1]['auto_score']
+                if score > max:
+                    max = score
+                    maxPos = v
+            if len(teams_single) == 3:
+                score = v[0]['auto_score'] + v[1]['auto_score'] + v[2]['auto_score']
+                if score > max:
+                    max = score
+                    maxPos = v
+
+        print(max)
+
+        self.maxPos = pd.DataFrame(list(maxPos),
+                              columns=['x', 'y', 'auto_score', 'team', 'label']
+                              )
+
+        self.compatibility = (max / theoretical_max) * 100
+
+        name = str(round(self.compatibility, 2)) + "%"
+
+        self.compatibility_data = {'name': name, 'compatibility': self.compatibility}
+
+        self.compatibility_data = pd.DataFrame(self.compatibility_data, index=[0])
+
+        print('compatibility_data', self.compatibility_data)
+
+    def return_compare_graph(self, title):
         team_length = len(self.team_key)
 
-        fig, axes = plt.subplots((1*team_length)+1, 2, figsize=(6, (5*team_length)+5))
+        fig, axes = plt.subplots((1 * team_length) + 1, 2, figsize=(6, (5 * team_length) + 5))
 
-        combined_data = None
+        i = 0
 
-        for d in data:
+        for d in self.data:
             general = pd.DataFrame(d['general'],
-                                   columns=[
-                                        "x",
-                                        "y",
-                                        "auto_score",
-                                        "team",
-                                        "label"
-                                    ])
-            masses = pd.DataFrame(d['masses'],
                                    columns=[
                                        "x",
                                        "y",
@@ -246,6 +350,14 @@ class Compare:
                                        "team",
                                        "label"
                                    ])
+            masses = pd.DataFrame(d['masses'],
+                                  columns=[
+                                      "x",
+                                      "y",
+                                      "auto_score",
+                                      "team",
+                                      "label"
+                                  ])
 
             sns.scatterplot(
                 data=general,
@@ -278,103 +390,10 @@ class Compare:
             axes[i, 1].set_xlim(0, 100)
             axes[i, 1].set_ylim(0, 250)
             axes[i, 1].imshow(self.img_blue, extent=[0, 100, 0, 250])
-            if i == 0:
-                combined_data = masses
-            if i != 0:
-                combined_data = pd.concat([combined_data, masses])
             i += 1
 
-        combined_data = combined_data.drop(columns=['label'])
-
-        to_label = []
-        for d in combined_data.to_dict(orient='records'):
-            to_label.append([
-                d['x'],
-                d['y']
-            ])
-
-        eps = 40
-        min_samples = 1
-        db = DBSCAN(eps=eps, min_samples=min_samples)
-        db.fit(to_label)
-
-        combined_data['label'] = db.labels_.tolist()
-
-        teams_single = []
-
-        for e in combined_data.to_dict(orient='records'):
-            if e['team'] in teams_single:
-                pass
-            else:
-                teams_single.append(e['team'])
-
-        theoretical_max = 0
-        team_max = []
-
-        for t in teams_single:
-            highestAuto = 0
-            for e in combined_data.to_dict(orient='records'):
-                if e['team'] == t:
-                    if e['auto_score'] > highestAuto:
-                        highestAuto = e['auto_score']
-            theoretical_max += highestAuto
-            team_max.append({'team': t, 'max': highestAuto})
-
-        print(team_max)
-        print(theoretical_max)
-
-        print(combined_data.to_dict(orient='records'))
-
-        combination = combinations(combined_data.to_dict(orient='records'), len(teams_single))
-
-        valid_entries = []
-
-        for entry in combination:
-            teams_seen = set()
-            labels_seen = set()
-            is_valid = True
-            for dict_item in entry:
-                team = dict_item['team']
-                label = dict_item['label']
-
-                if team in teams_seen or label in labels_seen:
-                    is_valid = False
-                    break
-                teams_seen.add(team)
-                labels_seen.add(label)
-            if is_valid:
-                valid_entries.append(entry)
-
-        # Print the valid entries
-        for valid_entry in valid_entries:
-            print(valid_entry)
-
-        max = 0
-
-        for v in valid_entries:
-            if len(teams_single) == 2:
-                score = v[0]['auto_score'] + v[1]['auto_score']
-                if score > max:
-                    max = score
-            if len(teams_single) == 3:
-                score = v[0]['auto_score'] + v[1]['auto_score'] + v[2]['auto_score']
-                if score > max:
-                    max = score
-
-        print(max)
-
-        compatibility = (max/theoretical_max)*100
-
-        name = str(round(compatibility, 2)) + "%"
-
-        compatibility_data = {'name': name, 'compatibility': compatibility}
-
-        compatibility_data = pd.DataFrame(compatibility_data, index=[0])
-
-        print('compatibility_data', compatibility_data)
-
         sns.scatterplot(
-            data=combined_data,
+            data=self.maxPos,
             x='x',
             y='y',
             hue='label',
@@ -390,7 +409,7 @@ class Compare:
         axes[i, 0].imshow(self.img_blue, extent=[0, 100, 0, 250])
 
         sns.barplot(
-            data=compatibility_data,
+            data=self.compatibility_data,
             x='name',
             y='compatibility',
             legend=False,
@@ -409,3 +428,5 @@ class Compare:
         plt.close()
 
         return buf
+    def return_compare_data(self):
+        return {'teams': self.data, 'combined': self.maxPos.to_dict(orient='records'), 'compatibility': self.compatibility}
