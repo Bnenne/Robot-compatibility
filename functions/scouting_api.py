@@ -56,6 +56,12 @@ class ScoutingAPI:
         for e in data:
             auto_actions = []
             auto_score = 0
+            intake_locations = {
+                'amp': 0,
+                'speaker': 0,
+                'trap': 0,
+                'center': 0
+            }
             if e['alliance'] == color:
                 for d in e['game']['actions']:
                     if d.get('phase') == 'auto':
@@ -63,17 +69,43 @@ class ScoutingAPI:
                 for a in auto_actions:
                     if a.get('action') == 'score':
                         auto_score += 1
+                    if a.get('action') == 'intake':
+                        if a.get('location') == 'amp':
+                            intake_locations['amp'] += 1
+                        if a.get('location') == 'speaker':
+                            intake_locations['speaker'] += 1
+                        if a.get('location') == 'trap':
+                            intake_locations['trap'] += 1
+                        if a.get('location') == 'center':
+                            intake_locations['center'] += 1
                 starts.append(
                     {
                     'x': e['pregame']['startPosition']['x'],
                     'y': e['pregame']['startPosition']['y'],
                     'auto_score': auto_score,
-                    'team': e['team']
+                    'team': e['team'],
+                    'amp': intake_locations['amp'],
+                    'speaker': intake_locations['speaker'],
+                    'trap': intake_locations['trap'],
+                    'center': intake_locations['center'],
                     }
                 )
 
         print(starts)
         return starts
+
+    def get_tele_actions(self):
+        # with open(str(self.team_key)+'.json', 'r') as f:
+        #     self.data = json.load(f)
+
+        actions = []
+
+        for d in self.data:
+            for e in d['game']['actions']:
+                if e['phase'] == 'teleOp':
+                    actions.append(e)
+
+        return actions
 
 def return_scoutingapi():
     events = requests.get('http://team1710scouting.vercel.app/api/key/event')
@@ -84,4 +116,10 @@ def return_tba():
     load_dotenv()
     api_key = os.getenv("API_KEY")
     data = requests.get('https://www.thebluealliance.com/api/v3/events/2024/simple?X-TBA-Auth-Key='+api_key)
+    return data.json()
+
+def return_teams(event):
+    load_dotenv()
+    api_key = os.getenv("API_KEY")
+    data = requests.get('https://www.thebluealliance.com/api/v3/event/'+event+'/teams/simple?X-TBA-Auth-Key=' + api_key)
     return data.json()

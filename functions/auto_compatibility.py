@@ -2,9 +2,14 @@ import pandas as pd
 import seaborn as sns
 import numpy as np
 import matplotlib.pyplot as plt
+from scipy.stats import zscore
 from sklearn.cluster import DBSCAN, KMeans
-from functions.scouting_api import ScoutingAPI
-import io
+from sklearn.covariance import EllipticEnvelope
+from sklearn.linear_model import LinearRegression
+from sklearn.preprocessing import MinMaxScaler
+
+from functions.scouting_api import ScoutingAPI, return_teams
+import io, requests, json, re
 from itertools import combinations
 
 class DataLabeling:
@@ -24,6 +29,8 @@ class DataLabeling:
         for p in points_blue:
             points.append(p)
 
+        print(points)
+
         points_formatted = []
         points_formatted_to_label = []
 
@@ -33,12 +40,16 @@ class DataLabeling:
                 p['x'],
                 p['y'],
                 p['auto_score'],
-                p['team']
+                p['team'],
+                p['amp'],
+                p['speaker'],
+                p['trap'],
+                p['center']
             ])
 
         eps = 25
         min_samples = 1
-
+        print('points_formatted_to_label', points_formatted_to_label)
         db = DBSCAN(eps=eps, min_samples=min_samples)
         db.fit(points_formatted_to_label)
 
@@ -47,7 +58,11 @@ class DataLabeling:
                               "x",
                               "y",
                               "auto_score",
-                              "team"
+                              "team",
+                              "amp",
+                              "speaker",
+                              "trap",
+                              "center"
                           ])
 
         sns.set_theme(style='whitegrid')
@@ -97,6 +112,10 @@ class DataLabeling:
                     p['y'],
                     p['auto_score'],
                     p['team'],
+                    p['amp'],
+                    p['speaker'],
+                    p['trap'],
+                    p['center'],
                     int(op.labels_[i])
                 ])
                 i += 1
@@ -107,7 +126,11 @@ class DataLabeling:
                                   "y",
                                   "auto_score",
                                   "team",
-                                  "label"
+                                  "label",
+                                  "amp",
+                                  "speaker",
+                                  "trap",
+                                  "center"
                               ])
             self.labels = op.labels_
 
@@ -135,9 +158,17 @@ class DataLabeling:
             y = 0
             auto_score = 0
             sample = 0
+            amp = 0
+            speaker = 0
+            trap = 0
+            center = 0
             for a in self.df.to_dict(orient='records'):
                 if a['label'] == l['label']:
                     l['points'].append(a)
+                    amp += a['amp']
+                    speaker += a['speaker']
+                    trap += a['trap']
+                    center += a['center']
             for e in l['points']:
                 sample += 1
                 x += e['x']
@@ -145,8 +176,12 @@ class DataLabeling:
                 auto_score += e['auto_score']
             x_mass = x/sample
             y_mass = y/sample
+            amp_mass = amp/sample
+            speaker_mass = speaker/sample
+            trap_mass = trap/sample
+            center_mass = center/sample
             auto_mass = auto_score/sample
-            masses.append({'x': x_mass, 'y': y_mass, 'auto_score': auto_mass, 'team': team, 'label': l['label']})
+            masses.append({'x': x_mass, 'y': y_mass, 'auto_score': auto_mass, 'team': team, 'label': l['label'],'amp': amp_mass, 'speaker': speaker_mass, 'trap': trap_mass, 'center': center_mass})
 
         self.df_masses = pd.DataFrame(masses,
                           columns=[
@@ -154,7 +189,11 @@ class DataLabeling:
                               "y",
                               "auto_score",
                               "team",
-                              "label"
+                              "label",
+                              "amp",
+                              "speaker",
+                              "trap",
+                              "center"
                           ])
     def return_graph(self, title):
         fig, axes = plt.subplots(1, 2, figsize=(6, 5))
@@ -262,7 +301,7 @@ class Compare:
             else:
                 teams_single.append(e['team'])
 
-        theoretical_max = 0
+        self.theoretical_max = 0
         team_max = []
 
         for t in teams_single:
@@ -271,11 +310,11 @@ class Compare:
                 if e['team'] == t:
                     if e['auto_score'] > highestAuto:
                         highestAuto = e['auto_score']
-            theoretical_max += highestAuto
+            self.theoretical_max += highestAuto
             team_max.append({'team': t, 'max': highestAuto})
 
         print(team_max)
-        print(theoretical_max)
+        print(self.theoretical_max)
 
         print(self.combined_data.to_dict(orient='records'))
 
@@ -303,28 +342,28 @@ class Compare:
         for valid_entry in valid_entries:
             print(valid_entry)
 
-        max = 0
+        self.max = 0
         self.maxPos = None
 
         for v in valid_entries:
             if len(teams_single) == 2:
                 score = v[0]['auto_score'] + v[1]['auto_score']
-                if score > max:
-                    max = score
-                    maxPos = v
+                if score > self.max:
+                    self.max = score
+                    self.maxPos = v
             if len(teams_single) == 3:
                 score = v[0]['auto_score'] + v[1]['auto_score'] + v[2]['auto_score']
-                if score > max:
-                    max = score
-                    maxPos = v
+                if score > self.max:
+                    self.max = score
+                    self.maxPos = v
 
-        print(max)
+        print(self.max)
 
-        self.maxPos = pd.DataFrame(list(maxPos),
+        self.maxPos = pd.DataFrame(list(self.maxPos),
                               columns=['x', 'y', 'auto_score', 'team', 'label']
                               )
 
-        self.compatibility = (max / theoretical_max) * 100
+        self.compatibility = (self.max / self.theoretical_max) * 100
 
         name = str(round(self.compatibility, 2)) + "%"
 
@@ -429,4 +468,160 @@ class Compare:
 
         return buf
     def return_compare_data(self):
-        return {'teams': self.data, 'combined': self.maxPos.to_dict(orient='records'), 'compatibility': self.compatibility}
+        return {'teams': self.data, 'combined': self.maxPos.to_dict(orient='records'), 'compatibility': self.compatibility, 'theoretical': self.theoretical_max, 'realistic': self.max}
+
+def meow(event, team):
+    try:
+        response = requests.get('https://api.statbotics.io/v3/matches?team='+team+'&year=2024&event='+event)
+
+        matches = []
+
+        for r in response.json():
+            matches.append(r['key'])
+
+        maybe = None
+
+        for a in matches:
+            match = re.search(r"sf\d+m\d+$", a)
+            if match:
+                maybe = a
+
+        if maybe is None:
+            return None
+
+        data = []
+
+        for m in matches:
+            response = requests.get('https://api.statbotics.io/v3/team_match/'+team+'/'+m)
+            response = response.json()
+            data.append({'match': m, 'auto_points': response['epa']['breakdown']['auto_points']})
+
+        def extract_match_number(item):
+            match = item["match"]
+            # Extract numbers after the prefix using regex
+            match_number = re.search(r'(qm|sf)(\d+m?\d*)', match)
+            if match_number:
+                # Convert qualifier and playoff match numbers into sortable tuples
+                prefix, num = match_number.groups()
+                if 'm' in num:
+                    return (1, int(num.split('m')[0]), int(num.split('m')[1]))
+                return (0, int(num))
+            return (float('inf'),)  # Default for unexpected cases
+
+        sorted_data = sorted(data, key=extract_match_number)
+        print('sorted_data', sorted_data)
+        length = len(sorted_data) - 1
+
+        last_match = sorted_data[length]['match']
+
+        teams = []
+
+        response = requests.get('https://api.statbotics.io/v3/match/'+last_match)
+        response = response.json()
+        teams.append(response['alliances']['red']['team_keys'])
+        teams.append(response['alliances']['blue']['team_keys'])
+
+        for t in teams:
+            if team in t:
+                teams = []
+                for a in t:
+                    teams.append('frc'+a)
+
+        compare = Compare('events', teams)
+        compatibility_data = compare.return_compare_data()
+
+        compatibility = compatibility_data['compatibility']
+
+        elims = []
+        quals = []
+
+        for a in sorted_data:
+            match = re.search(r"sf\d+m\d+$", a['match'])
+            if match:
+                elims.append(a)
+            else:
+                quals.append(a)
+
+        elims_epa_average = 0
+        for e in elims:
+            elims_epa_average += e['auto_points']
+        elims_epa_average = elims_epa_average/(len(elims))
+
+        quals_epa_average = 0
+        for e in quals:
+            quals_epa_average += e['auto_points']
+        quals_epa_average = quals_epa_average / (len(quals))
+
+        difference = (elims_epa_average - quals_epa_average)/quals_epa_average
+
+        return {'difference': difference, 'compatibility': compatibility}
+    except:
+        return None
+
+def gimme(event):
+    data = return_teams(event)
+
+    teams = []
+
+    for d in data:
+        key = d['key']
+        result = key.replace("frc", "")
+        teams.append(result)
+
+    purr = []
+
+    for t in teams:
+        nya = meow(event, t)
+        if nya is None:
+            pass
+        else:
+            purr.append(nya)
+
+    return purr
+
+def nyan():
+#     events = ['2024wila', '2024ksla']
+#     data = []
+#     for e in events:
+#         response = gimme(e)
+#         for r in response:
+#             data.append(r)
+#
+#     df = pd.DataFrame(data,
+#             columns=[
+#                 'difference',
+#                 'compatibility'
+#             ]
+#         )
+
+    df = pd.read_csv("output_file.csv")
+
+    x = df[['compatibility']]
+    y = df['difference']
+
+    model = LinearRegression()
+    model.fit(x, y)
+
+    y_pred = model.predict(x)
+
+    residuals = y - y_pred
+
+    residual_mean = residuals.mean()
+    residual_std = residuals.std()
+
+    threshold = residual_mean + 1.2 * residual_std
+
+    filtered_df = df[np.abs(residuals) <= threshold]
+
+    scaler = MinMaxScaler()
+    filtered_df[['compatibility', 'difference']] = scaler.fit_transform(filtered_df[['compatibility', 'difference']])
+
+    sns.regplot(data=filtered_df, x='compatibility', y='difference')
+    buf = io.BytesIO()
+    plt.savefig(buf, format='png')
+    buf.seek(0)
+    plt.close()
+
+    # df.to_csv("output_file.csv", index=False)
+
+    return buf
