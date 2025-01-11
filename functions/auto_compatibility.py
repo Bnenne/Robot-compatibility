@@ -1,3 +1,5 @@
+import math
+
 import pandas as pd
 import seaborn as sns
 import numpy as np
@@ -260,6 +262,120 @@ class Compare:
 
         print(self.data)
 
+        self.general_confidence = pd.DataFrame(columns=[
+                                      "x",
+                                      "y",
+                                      "auto_score",
+                                      "team",
+                                      "label"
+                                  ])
+        self.masses_confidence = pd.DataFrame(columns=[
+                                      "x",
+                                      "y",
+                                      "auto_score",
+                                      "team",
+                                      "label"
+                                  ])
+
+        for d in self.data:
+            general_confidence = pd.DataFrame(d['general'],
+                                  columns=[
+                                      "x",
+                                      "y",
+                                      "auto_score",
+                                      "team",
+                                      "label"
+                                  ])
+            self.general_confidence = pd.concat([self.general_confidence, general_confidence])
+            masses_confidence = pd.DataFrame(d['masses'],
+                                              columns=[
+                                                  "x",
+                                                  "y",
+                                                  "auto_score",
+                                                  "team",
+                                                  "label"
+                                              ])
+            self.masses_confidence = pd.concat([self.masses_confidence, masses_confidence])
+
+        self.masses_confidence = self.masses_confidence.to_dict(orient='records')
+        self.general_confidence = self.general_confidence.to_dict(orient='records')
+
+        self.confidences = []
+
+        print(self.masses_confidence)
+        print(self.general_confidence)
+
+        for m in self.masses_confidence:
+            confidences = []
+            for g in self.general_confidence:
+                if g['team'] == m['team'] and g['label'] == m['label']:
+                    x = g['x'] - m['x']
+                    y = g['y'] - m['y']
+                    confidences.append(math.sqrt((x*x)+(y*y)))
+            self.confidences.append({'confidences': confidences, 'team': m['team']})
+
+        print('confidences', self.confidences)
+
+        self.i = 0
+        self.total = 0
+
+        for c in self.confidences:
+            i = 0
+            total = 0
+            for a in c['confidences']:
+                i += 1
+                confidence = (50-a)/50
+                if confidence < 0:
+                    confidence = 0
+                total += confidence
+            self.i += 1
+            self.total += total / i
+
+        starting_confidence = self.total / self.i
+
+        print('starting_confidence', starting_confidence)
+
+        confidence_teams = []
+        confidence_team = []
+
+        for g in self.general_confidence:
+            team = str(g['team'])
+            if g['team'] not in confidence_teams:
+                confidence_teams.append(g['team'])
+                confidence_team.append({team: 0})
+            for c in confidence_team:
+                try:
+                    c[team] += 1
+                except:
+                    pass
+
+        for c in confidence_team:
+            team = ""
+            for key, value in c.items():
+                team = key
+            confidence = c[team]/30
+            if confidence > 1:
+                confidence = 1
+            c[team] = confidence
+
+        self.i = 0
+        self.data_confidence = 0
+
+        for c in confidence_team:
+            team = ""
+            for key, value in c.items():
+                team = key
+            self.i += 1
+            self.data_confidence += c[team]
+
+        self.data_confidence = self.data_confidence / self.i
+
+        print('data_confidence', self.data_confidence)
+
+        self.confidence = (self.data_confidence*0.5)+(starting_confidence*0.5)
+
+        print('confidence', self.confidence)
+
         i = 0
 
         self.combined_data = None
@@ -340,7 +456,7 @@ class Compare:
 
         # Print the valid entries
         for valid_entry in valid_entries:
-            print(valid_entry)
+            print("valid entries", valid_entry)
 
         self.max = 0
         self.maxPos = None
