@@ -3,31 +3,31 @@ from dotenv import load_dotenv
 
 class ScoutingAPI:
     def __init__(self, event_key, team_key):
-        # self.event_key = []
-        # self.team_key = team_key
-        # load_dotenv()
-        # self.api_key = os.getenv("API_KEY")
-        # if 'events' in event_key:
-        #     events = requests.get('https://www.thebluealliance.com/api/v3/team/'+self.team_key+'/events/2024/simple?X-TBA-Auth-Key='+self.api_key)
-        #     print(events.json())
-        #     for event in events.json():
-        #         self.event_key.append(event.get("key"))
-        # else:
-        #     self.event_key.append(event_key)
-        #
-        # self.data = []
-        #
-        # for key in self.event_key:
-        #     r = requests.get('http://team1710scouting.vercel.app/api/'+key+'/'+self.team_key)
-        #     for e in r.json():
-        #         self.data.append(e)
+        self.event_key = []
+        self.team_key = team_key
+        load_dotenv()
+        self.api_key = os.getenv("API_KEY")
+        if 'events' in event_key:
+            events = requests.get('https://www.thebluealliance.com/api/v3/team/'+self.team_key+'/events/2024/simple?X-TBA-Auth-Key='+self.api_key)
+            print(events.json())
+            for event in events.json():
+                self.event_key.append(event.get("key"))
+        else:
+            self.event_key.append(event_key)
 
         self.data = []
-        self.team_key = team_key
+
+        for key in self.event_key:
+            r = requests.get('http://team1710scouting.vercel.app/api/'+key+'/'+self.team_key)
+            for e in r.json():
+                self.data.append(e)
+
+        # self.data = []
+        # self.team_key = team_key
 
     def get_start_red(self):
-        with open(str(self.team_key)+'.json', 'r') as f:
-            self.data = json.load(f)
+        # with open(str(self.team_key)+'.json', 'r') as f:
+        #     self.data = json.load(f)
 
         starts = self.starts('red', self.data)
 
@@ -43,8 +43,8 @@ class ScoutingAPI:
         return starts
 
     def get_start_blue(self):
-        with open(str(self.team_key)+'.json', 'r') as f:
-            self.data = json.load(f)
+        # with open(str(self.team_key)+'.json', 'r') as f:
+        #     self.data = json.load(f)
 
         starts = self.starts('blue', self.data)
 
@@ -95,8 +95,8 @@ class ScoutingAPI:
         return starts
 
     def get_tele_actions(self):
-        with open(str(self.team_key)+'.json', 'r') as f:
-            self.data = json.load(f)
+        # with open(str(self.team_key)+'.json', 'r') as f:
+        #     self.data = json.load(f)
 
         actions = []
 
