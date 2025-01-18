@@ -215,23 +215,22 @@ class DataLabeling:
             x='x',
             y='y',
             hue=self.labels,
-            palette='CMRmap',
+            palette='Accent',
             size='auto_score',
             legend=False,
             ax=axes[0]
         )
         axes[0].set_xlabel("X")
         axes[0].set_ylabel("Y")
-        axes[0].set_xlim(0, 100)
-        axes[0].set_ylim(0, 250)
-        axes[0].imshow(self.img_blue, extent=[0, 100, 0, 250])
+        axes[0].set_xlim(0, 500)
+        axes[0].set_ylim(-1, 1)
 
         sns.scatterplot(
             data=self.df_masses,
             x='x',
             y='y',
             hue='label',
-            palette='CMRmap',
+            palette='Accent',
             size='auto_score',
             legend=False,
             ax=axes[1]
@@ -239,9 +238,8 @@ class DataLabeling:
 
         axes[1].set_xlabel("X")
         axes[1].set_ylabel("Y")
-        axes[1].set_xlim(0, 100)
-        axes[1].set_ylim(0, 250)
-        axes[1].imshow(self.img_blue, extent=[0, 100, 0, 250])
+        axes[1].set_xlim(0, 500)
+        axes[1].set_ylim(-1, 1)
 
         plt.suptitle(title)
         plt.tight_layout()
@@ -502,7 +500,7 @@ class Compare:
     def return_compare_graph(self, title):
         team_length = len(self.team_key)
 
-        fig, axes = plt.subplots((1 * team_length) + 1, 2, figsize=(6, (5 * team_length) + 5))
+        fig, axes = plt.subplots((1 * team_length) + 1, 2, figsize=(6, team_length + 5))
 
         i = 0
 
@@ -529,32 +527,30 @@ class Compare:
                 x='x',
                 y='y',
                 hue='label',
-                palette='CMRmap',
+                palette='Accent',
                 size='auto_score',
                 legend=False,
                 ax=axes[i, 0]
             )
             axes[i, 0].set_xlabel("X")
             axes[i, 0].set_ylabel("Y")
-            axes[i, 0].set_xlim(0, 100)
-            axes[i, 0].set_ylim(0, 250)
-            axes[i, 0].imshow(self.img_blue, extent=[0, 100, 0, 250])
+            axes[i, 0].set_xlim(0, 500)
+            axes[i, 0].set_ylim(-1, 1)
 
             sns.scatterplot(
                 data=masses,
                 x='x',
                 y='y',
                 hue='label',
-                palette='CMRmap',
+                palette='Accent',
                 size='auto_score',
                 legend=False,
                 ax=axes[i, 1]
             )
             axes[i, 1].set_xlabel("X")
             axes[i, 1].set_ylabel("Y")
-            axes[i, 1].set_xlim(0, 100)
-            axes[i, 1].set_ylim(0, 250)
-            axes[i, 1].imshow(self.img_blue, extent=[0, 100, 0, 250])
+            axes[i, 1].set_xlim(0, 500)
+            axes[i, 1].set_ylim(-1, 1)
             i += 1
 
         sns.scatterplot(
@@ -562,16 +558,15 @@ class Compare:
             x='x',
             y='y',
             hue='label',
-            palette='CMRmap',
+            palette='Accent',
             size='auto_score',
             legend=False,
             ax=axes[i, 0]
         )
         axes[i, 0].set_xlabel("X")
         axes[i, 0].set_ylabel("Y")
-        axes[i, 0].set_xlim(0, 100)
-        axes[i, 0].set_ylim(0, 250)
-        axes[i, 0].imshow(self.img_blue, extent=[0, 100, 0, 250])
+        axes[i, 0].set_xlim(0, 500)
+        axes[i, 0].set_ylim(-1, 1)
 
         sns.barplot(
             data=self.compatibility_data,

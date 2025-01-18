@@ -38,14 +38,14 @@ class ScoutingAPI:
 
         starts = self.starts('red', self.data)
 
-        for p in starts:
-            x = p.get('x')
-            if x > 50:
-                p['x'] = 50 - (x - 50)
-            elif x < 50:
-                p['x'] = 50 + (50 - x)
-            elif x == 50:
-                p['x'] = 50
+        # for p in starts:
+        #     x = p.get('x')
+        #     if x > 50:
+        #         p['x'] = 50 - (x - 50)
+        #     elif x < 50:
+        #         p['x'] = 50 + (50 - x)
+        #     elif x == 50:
+        #         p['x'] = 50
 
         return starts
 
