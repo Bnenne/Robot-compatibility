@@ -43,10 +43,11 @@ class DataLabeling:
                 p['y'],
                 p['auto_score'],
                 p['team'],
-                p['amp'],
-                p['speaker'],
-                p['trap'],
-                p['center']
+                p['processor'],
+                p['coral_station'],
+                p['reef'],
+                p['alliance'],
+                p['barge']
             ])
 
         eps = 25
@@ -61,10 +62,11 @@ class DataLabeling:
                               "y",
                               "auto_score",
                               "team",
-                              "amp",
-                              "speaker",
-                              "trap",
-                              "center"
+                              'processor',
+                              'coral_station',
+                              'reef',
+                              'alliance',
+                              'barge'
                           ])
 
         sns.set_theme(style='whitegrid')
@@ -72,6 +74,8 @@ class DataLabeling:
         self.img_blue = plt.imread('functions/assets/starting_map.png')
 
         df_copy = df
+        print('df_copy', df_copy)
+        print('db.labels_', db.labels_)
         df_copy['label'] = db.labels_
 
         labels_array = np.array(db.labels_)
@@ -114,10 +118,11 @@ class DataLabeling:
                     p['y'],
                     p['auto_score'],
                     p['team'],
-                    p['amp'],
-                    p['speaker'],
-                    p['trap'],
-                    p['center'],
+                    p['processor'],
+                    p['coral_station'],
+                    p['reef'],
+                    p['alliance'],
+                    p['barge'],
                     int(op.labels_[i])
                 ])
                 i += 1
@@ -129,10 +134,11 @@ class DataLabeling:
                                   "auto_score",
                                   "team",
                                   "label",
-                                  "amp",
-                                  "speaker",
-                                  "trap",
-                                  "center"
+                                  'processor',
+                                  'coral_station',
+                                  'reef',
+                                  'alliance',
+                                  'barge'
                               ])
             self.labels = op.labels_
 
@@ -160,17 +166,19 @@ class DataLabeling:
             y = 0
             auto_score = 0
             sample = 0
-            amp = 0
-            speaker = 0
-            trap = 0
-            center = 0
+            processor = 0
+            coral_station = 0
+            reef = 0
+            alliance = 0
+            barge = 0
             for a in self.df.to_dict(orient='records'):
                 if a['label'] == l['label']:
                     l['points'].append(a)
-                    amp += a['amp']
-                    speaker += a['speaker']
-                    trap += a['trap']
-                    center += a['center']
+                    processor += a['processor']
+                    coral_station += a['coral_station']
+                    reef += a['reef']
+                    alliance += a['alliance']
+                    barge += a['barge']
             for e in l['points']:
                 sample += 1
                 x += e['x']
@@ -178,12 +186,13 @@ class DataLabeling:
                 auto_score += e['auto_score']
             x_mass = x/sample
             y_mass = y/sample
-            amp_mass = amp/sample
-            speaker_mass = speaker/sample
-            trap_mass = trap/sample
-            center_mass = center/sample
+            processor_mass = processor/sample
+            coral_mass = coral_station/sample
+            reef_mass = reef/sample
+            alliance_mass = alliance/sample
+            barge_mass = barge/sample
             auto_mass = auto_score/sample
-            masses.append({'x': x_mass, 'y': y_mass, 'auto_score': auto_mass, 'team': team, 'label': l['label'],'amp': amp_mass, 'speaker': speaker_mass, 'trap': trap_mass, 'center': center_mass})
+            masses.append({'x': x_mass, 'y': y_mass, 'auto_score': auto_mass, 'team': team, 'label': l['label'],'processor': processor_mass, 'coral_station': coral_mass, 'reef': reef_mass, 'alliance': alliance_mass, 'barge': barge_mass})
 
         self.df_masses = pd.DataFrame(masses,
                           columns=[
@@ -192,10 +201,11 @@ class DataLabeling:
                               "auto_score",
                               "team",
                               "label",
-                              "amp",
-                              "speaker",
-                              "trap",
-                              "center"
+                              "processor",
+                              "coral_station",
+                              "reef",
+                              "alliance",
+                              "barge"
                           ])
     def return_graph(self, title):
         fig, axes = plt.subplots(1, 2, figsize=(6, 5))

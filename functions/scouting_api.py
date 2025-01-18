@@ -3,27 +3,34 @@ from dotenv import load_dotenv
 
 class ScoutingAPI:
     def __init__(self, event_key, team_key):
-        self.event_key = []
-        self.team_key = team_key
-        load_dotenv()
-        self.api_key = os.getenv("API_KEY")
-        if 'events' in event_key:
-            events = requests.get('https://www.thebluealliance.com/api/v3/team/'+self.team_key+'/events/2024/simple?X-TBA-Auth-Key='+self.api_key)
-            print(events.json())
-            for event in events.json():
-                self.event_key.append(event.get("key"))
-        else:
-            self.event_key.append(event_key)
+        # self.event_key = []
+        # self.team_key = team_key
+        # load_dotenv()
+        # self.api_key = os.getenv("API_KEY")
+        # if 'events' in event_key:
+        #     events = requests.get('https://www.thebluealliance.com/api/v3/team/'+self.team_key+'/events/2024/simple?X-TBA-Auth-Key='+self.api_key)
+        #     print(events.json())
+        #     for event in events.json():
+        #         self.event_key.append(event.get("key"))
+        # else:
+        #     self.event_key.append(event_key)
+        #
+        # self.data = []
+        #
+        # for key in self.event_key:
+        #     r = requests.get('http://team1710scouting.vercel.app/api/'+key+'/'+self.team_key)
+        #     for e in r.json():
+        #         self.data.append(e)
 
         self.data = []
+        self.team_key = team_key[3:]
 
-        for key in self.event_key:
-            r = requests.get('http://team1710scouting.vercel.app/api/'+key+'/'+self.team_key)
-            for e in r.json():
-                self.data.append(e)
+        with open('data.json', 'r') as f:
+            file_data = json.load(f)
 
-        # self.data = []
-        # self.team_key = team_key
+        for f in file_data:
+            if f['team'] == self.team_key:
+                self.data.append(f)
 
     def get_start_red(self):
         # with open(str(self.team_key)+'.json', 'r') as f:
@@ -57,37 +64,41 @@ class ScoutingAPI:
             auto_actions = []
             auto_score = 0
             intake_locations = {
-                'amp': 0,
-                'speaker': 0,
-                'trap': 0,
-                'center': 0
+                'processor': 0,
+                'coral_station': 0,
+                'reef': 0,
+                'alliance': 0,
+                'barge': 0
             }
             if e['alliance'] == color:
-                for d in e['game']['actions']:
+                for d in e['actions']:
                     if d.get('phase') == 'auto':
                         auto_actions.append(d)
                 for a in auto_actions:
                     if a.get('action') == 'score':
                         auto_score += 1
                     if a.get('action') == 'intake':
-                        if a.get('location') == 'amp':
-                            intake_locations['amp'] += 1
-                        if a.get('location') == 'speaker':
-                            intake_locations['speaker'] += 1
-                        if a.get('location') == 'trap':
-                            intake_locations['trap'] += 1
-                        if a.get('location') == 'center':
-                            intake_locations['center'] += 1
+                        if a.get('location') == 'processor':
+                            intake_locations['processor'] += 1
+                        if a.get('location') == 'coral_station':
+                            intake_locations['coral_station'] += 1
+                        if a.get('location') == 'reef':
+                            intake_locations['reef'] += 1
+                        if a.get('location') == 'alliance':
+                            intake_locations['alliance'] += 1
+                        if a.get('location') == 'barge':
+                            intake_locations['barge'] += 1
                 starts.append(
                     {
                     'x': e['pregame']['startPosition']['x'],
                     'y': e['pregame']['startPosition']['y'],
                     'auto_score': auto_score,
                     'team': e['team'],
-                    'amp': intake_locations['amp'],
-                    'speaker': intake_locations['speaker'],
-                    'trap': intake_locations['trap'],
-                    'center': intake_locations['center'],
+                    'processor': intake_locations['processor'],
+                    'coral_station': intake_locations['coral_station'],
+                    'reef': intake_locations['reef'],
+                    'alliance': intake_locations['alliance'],
+                    'barge': intake_locations['barge']
                     }
                 )
 
@@ -101,7 +112,7 @@ class ScoutingAPI:
         actions = []
 
         for d in self.data:
-            for e in d['game']['actions']:
+            for e in d['actions']:
                 if e['phase'] == 'teleOp':
                     actions.append(e)
 
