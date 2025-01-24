@@ -1,5 +1,6 @@
 from flask import Flask, jsonify, send_file
-from functions.auto_compatibility import DataLabeling, Compare, nyan
+from functions.auto_compatibility import DataLabeling, Compare
+# nyan
 from functions.tele_compatibility import StrategyLabeling
 from functions.scouting_api import return_scoutingapi, return_tba
 from flask_cors import cross_origin
