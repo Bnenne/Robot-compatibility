@@ -59,23 +59,23 @@ def get_auto_compare_data3(event, team1, team2, team3):
     compare = Compare(event, teams)
     return jsonify(compare.return_compare_data()), 200
 
-@app.route("/tele/graph/<event>/<team>", methods=['GET'])
-@cross_origin()
-def get_tele_graph(event, team):
-    title = "/tele/graph/" + event + "/" + team
-    dl = DataLabeling(event, team)
-    return send_file(dl.return_graph(title), mimetype='image/png'), 200
-
-@app.route("/tele/data/<event>/<team>", methods=['GET'])
-@cross_origin()
-def get_tele_data(event, team):
-    sl = StrategyLabeling(event, team)
-    return jsonify(sl.tele_actions()), 200
-
-@app.route("/gimme", methods=['GET'])
-@cross_origin()
-def gimme_meow():
-    return send_file(nyan(), mimetype='image/png'), 200
+# @app.route("/tele/graph/<event>/<team>", methods=['GET'])
+# @cross_origin()
+# def get_tele_graph(event, team):
+#     title = "/tele/graph/" + event + "/" + team
+#     dl = DataLabeling(event, team)
+#     return send_file(dl.return_graph(title), mimetype='image/png'), 200
+#
+# @app.route("/tele/data/<event>/<team>", methods=['GET'])
+# @cross_origin()
+# def get_tele_data(event, team):
+#     sl = StrategyLabeling(event, team)
+#     return jsonify(sl.tele_actions()), 200
+#
+# @app.route("/gimme", methods=['GET'])
+# @cross_origin()
+# def gimme_meow():
+#     return send_file(nyan(), mimetype='image/png'), 200
 
 if __name__ == "__main__": 
     app.run(debug=True)

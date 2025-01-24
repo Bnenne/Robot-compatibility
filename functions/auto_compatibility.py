@@ -1,18 +1,13 @@
-import math
-
 import pandas as pd
 import seaborn as sns
 import numpy as np
 import matplotlib.pyplot as plt
-from scipy.stats import zscore
 from sklearn.cluster import DBSCAN, KMeans
-from sklearn.covariance import EllipticEnvelope
 from sklearn.linear_model import LinearRegression
 from sklearn.preprocessing import MinMaxScaler
-
 from functions.scouting_api import ScoutingAPI, return_teams
-import io, requests, json, re
 from itertools import combinations
+import io, requests, math, re
 
 class DataLabeling:
     def __init__(self, event_key, team_key):
@@ -586,158 +581,158 @@ class Compare:
     def return_compare_data(self):
         return {'teams': self.data, 'combined': self.maxPos.to_dict(orient='records'), 'compatibility': self.compatibility, 'theoretical': self.theoretical_max, 'realistic': self.max}
 
-def meow(event, team):
-    try:
-        response = requests.get('https://api.statbotics.io/v3/matches?team='+team+'&year=2024&event='+event)
-
-        matches = []
-
-        for r in response.json():
-            matches.append(r['key'])
-
-        maybe = None
-
-        for a in matches:
-            match = re.search(r"sf\d+m\d+$", a)
-            if match:
-                maybe = a
-
-        if maybe is None:
-            return None
-
-        data = []
-
-        for m in matches:
-            response = requests.get('https://api.statbotics.io/v3/team_match/'+team+'/'+m)
-            response = response.json()
-            data.append({'match': m, 'auto_points': response['epa']['breakdown']['auto_points']})
-
-        def extract_match_number(item):
-            match = item["match"]
-            # Extract numbers after the prefix using regex
-            match_number = re.search(r'(qm|sf)(\d+m?\d*)', match)
-            if match_number:
-                # Convert qualifier and playoff match numbers into sortable tuples
-                prefix, num = match_number.groups()
-                if 'm' in num:
-                    return (1, int(num.split('m')[0]), int(num.split('m')[1]))
-                return (0, int(num))
-            return (float('inf'),)  # Default for unexpected cases
-
-        sorted_data = sorted(data, key=extract_match_number)
-        print('sorted_data', sorted_data)
-        length = len(sorted_data) - 1
-
-        last_match = sorted_data[length]['match']
-
-        teams = []
-
-        response = requests.get('https://api.statbotics.io/v3/match/'+last_match)
-        response = response.json()
-        teams.append(response['alliances']['red']['team_keys'])
-        teams.append(response['alliances']['blue']['team_keys'])
-
-        for t in teams:
-            if team in t:
-                teams = []
-                for a in t:
-                    teams.append('frc'+a)
-
-        compare = Compare('events', teams)
-        compatibility_data = compare.return_compare_data()
-
-        compatibility = compatibility_data['compatibility']
-
-        elims = []
-        quals = []
-
-        for a in sorted_data:
-            match = re.search(r"sf\d+m\d+$", a['match'])
-            if match:
-                elims.append(a)
-            else:
-                quals.append(a)
-
-        elims_epa_average = 0
-        for e in elims:
-            elims_epa_average += e['auto_points']
-        elims_epa_average = elims_epa_average/(len(elims))
-
-        quals_epa_average = 0
-        for e in quals:
-            quals_epa_average += e['auto_points']
-        quals_epa_average = quals_epa_average / (len(quals))
-
-        difference = (elims_epa_average - quals_epa_average)/quals_epa_average
-
-        return {'difference': difference, 'compatibility': compatibility}
-    except:
-        return None
-
-def gimme(event):
-    data = return_teams(event)
-
-    teams = []
-
-    for d in data:
-        key = d['key']
-        result = key.replace("frc", "")
-        teams.append(result)
-
-    purr = []
-
-    for t in teams:
-        nya = meow(event, t)
-        if nya is None:
-            pass
-        else:
-            purr.append(nya)
-
-    return purr
-
-def nyan():
-#     events = ['2024wila', '2024ksla']
-#     data = []
-#     for e in events:
-#         response = gimme(e)
-#         for r in response:
-#             data.append(r)
+# def meow(event, team):
+#     try:
+#         response = requests.get('https://api.statbotics.io/v3/matches?team='+team+'&year=2024&event='+event)
 #
-#     df = pd.DataFrame(data,
-#             columns=[
-#                 'difference',
-#                 'compatibility'
-#             ]
-#         )
-
-    df = pd.read_csv("output_file.csv")
-
-    x = df[['compatibility']]
-    y = df['difference']
-
-    model = LinearRegression()
-    model.fit(x, y)
-
-    y_pred = model.predict(x)
-
-    residuals = y - y_pred
-
-    residual_mean = residuals.mean()
-    residual_std = residuals.std()
-
-    threshold = residual_mean + 1.2 * residual_std
-
-    filtered_df = df[np.abs(residuals) <= threshold]
-
-    scaler = MinMaxScaler()
-    filtered_df[['compatibility', 'difference']] = scaler.fit_transform(filtered_df[['compatibility', 'difference']])
-
-    sns.regplot(data=filtered_df, x='compatibility', y='difference')
-    buf = io.BytesIO()
-    plt.savefig(buf, format='png')
-    buf.seek(0)
-    plt.close()
-
-    # df.to_csv("output_file.csv", index=False)
-
-    return buf
+#         matches = []
+#
+#         for r in response.json():
+#             matches.append(r['key'])
+#
+#         maybe = None
+#
+#         for a in matches:
+#             match = re.search(r"sf\d+m\d+$", a)
+#             if match:
+#                 maybe = a
+#
+#         if maybe is None:
+#             return None
+#
+#         data = []
+#
+#         for m in matches:
+#             response = requests.get('https://api.statbotics.io/v3/team_match/'+team+'/'+m)
+#             response = response.json()
+#             data.append({'match': m, 'auto_points': response['epa']['breakdown']['auto_points']})
+#
+#         def extract_match_number(item):
+#             match = item["match"]
+#             # Extract numbers after the prefix using regex
+#             match_number = re.search(r'(qm|sf)(\d+m?\d*)', match)
+#             if match_number:
+#                 # Convert qualifier and playoff match numbers into sortable tuples
+#                 prefix, num = match_number.groups()
+#                 if 'm' in num:
+#                     return (1, int(num.split('m')[0]), int(num.split('m')[1]))
+#                 return (0, int(num))
+#             return (float('inf'),)  # Default for unexpected cases
+#
+#         sorted_data = sorted(data, key=extract_match_number)
+#         print('sorted_data', sorted_data)
+#         length = len(sorted_data) - 1
+#
+#         last_match = sorted_data[length]['match']
+#
+#         teams = []
+#
+#         response = requests.get('https://api.statbotics.io/v3/match/'+last_match)
+#         response = response.json()
+#         teams.append(response['alliances']['red']['team_keys'])
+#         teams.append(response['alliances']['blue']['team_keys'])
+#
+#         for t in teams:
+#             if team in t:
+#                 teams = []
+#                 for a in t:
+#                     teams.append('frc'+a)
+#
+#         compare = Compare('events', teams)
+#         compatibility_data = compare.return_compare_data()
+#
+#         compatibility = compatibility_data['compatibility']
+#
+#         elims = []
+#         quals = []
+#
+#         for a in sorted_data:
+#             match = re.search(r"sf\d+m\d+$", a['match'])
+#             if match:
+#                 elims.append(a)
+#             else:
+#                 quals.append(a)
+#
+#         elims_epa_average = 0
+#         for e in elims:
+#             elims_epa_average += e['auto_points']
+#         elims_epa_average = elims_epa_average/(len(elims))
+#
+#         quals_epa_average = 0
+#         for e in quals:
+#             quals_epa_average += e['auto_points']
+#         quals_epa_average = quals_epa_average / (len(quals))
+#
+#         difference = (elims_epa_average - quals_epa_average)/quals_epa_average
+#
+#         return {'difference': difference, 'compatibility': compatibility}
+#     except:
+#         return None
+#
+# def gimme(event):
+#     data = return_teams(event)
+#
+#     teams = []
+#
+#     for d in data:
+#         key = d['key']
+#         result = key.replace("frc", "")
+#         teams.append(result)
+#
+#     purr = []
+#
+#     for t in teams:
+#         nya = meow(event, t)
+#         if nya is None:
+#             pass
+#         else:
+#             purr.append(nya)
+#
+#     return purr
+#
+# def nyan():
+# #     events = ['2024wila', '2024ksla']
+# #     data = []
+# #     for e in events:
+# #         response = gimme(e)
+# #         for r in response:
+# #             data.append(r)
+# #
+# #     df = pd.DataFrame(data,
+# #             columns=[
+# #                 'difference',
+# #                 'compatibility'
+# #             ]
+# #         )
+#
+#     df = pd.read_csv("output_file.csv")
+#
+#     x = df[['compatibility']]
+#     y = df['difference']
+#
+#     model = LinearRegression()
+#     model.fit(x, y)
+#
+#     y_pred = model.predict(x)
+#
+#     residuals = y - y_pred
+#
+#     residual_mean = residuals.mean()
+#     residual_std = residuals.std()
+#
+#     threshold = residual_mean + 1.2 * residual_std
+#
+#     filtered_df = df[np.abs(residuals) <= threshold]
+#
+#     scaler = MinMaxScaler()
+#     filtered_df[['compatibility', 'difference']] = scaler.fit_transform(filtered_df[['compatibility', 'difference']])
+#
+#     sns.regplot(data=filtered_df, x='compatibility', y='difference')
+#     buf = io.BytesIO()
+#     plt.savefig(buf, format='png')
+#     buf.seek(0)
+#     plt.close()
+#
+#     # df.to_csv("output_file.csv", index=False)
+#
+#     return buf
