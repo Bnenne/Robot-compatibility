@@ -18,7 +18,7 @@ class ScoutingAPI:
         self.data = []
 
         for key in self.event_key:
-            r = requests.get('http://team1710scouting.vercel.app/api/'+key+'/'+self.team_key)
+            r = requests.get('http://scouting.team1710.com/api/'+key+'/'+self.team_key)
             for e in r.json():
                 self.data.append(e)
 
@@ -108,8 +108,8 @@ class ScoutingAPI:
         return actions
 
 def return_scoutingapi():
-    events = requests.get('http://team1710scouting.vercel.app/api/key/event')
-    teams = requests.get('http://team1710scouting.vercel.app/api/key/team')
+    events = requests.get('http://scouting.team1710.com/api/key/event')
+    teams = requests.get('http://scouting.team1710.com/api/key/team')
     return {'events': events.json(), 'teams': teams.json()}
 
 def return_tba():
