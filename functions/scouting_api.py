@@ -8,8 +8,8 @@ class ScoutingAPI:
         load_dotenv()
         self.api_key = os.getenv("API_KEY")
         if 'events' in event_key:
-            events = requests.get('https://www.thebluealliance.com/api/v3/team/'+self.team_key+'/events/2024/simple?X-TBA-Auth-Key='+self.api_key)
-            print(events.json())
+            events = requests.get('https://www.thebluealliance.com/api/v3/team/'+self.team_key+'/events/2025/simple?X-TBA-Auth-Key='+self.api_key)
+            print('events.json()', events.json())
             for event in events.json():
                 self.event_key.append(event.get("key"))
         else:
@@ -91,7 +91,7 @@ class ScoutingAPI:
                     }
                 )
 
-        print(starts)
+        print('starts', starts)
         return starts
 
     def get_tele_actions(self):
@@ -115,7 +115,7 @@ def return_scoutingapi():
 def return_tba():
     load_dotenv()
     api_key = os.getenv("API_KEY")
-    data = requests.get('https://www.thebluealliance.com/api/v3/events/2024/simple?X-TBA-Auth-Key='+api_key)
+    data = requests.get('https://www.thebluealliance.com/api/v3/events/2025/simple?X-TBA-Auth-Key='+api_key)
     return data.json()
 
 def return_teams(event):

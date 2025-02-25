@@ -26,7 +26,7 @@ class DataLabeling:
         for p in points_blue:
             points.append(p)
 
-        print(points)
+        print('points', points)
 
         points_formatted = []
         points_formatted_to_label = []
