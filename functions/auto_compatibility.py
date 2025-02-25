@@ -20,18 +20,9 @@ class DataLabeling:
         self.team_key = team_key
         sa = ScoutingAPI(self.event_key, self.team_key)
 
-        points_red = sa.get_start_red()
-        points_blue = sa.get_start_blue()
+        points = sa.get_starts()
 
-        points = []
-
-        for p in points_red:
-            points.append(p)
-
-        for p in points_blue:
-            points.append(p)
-
-        print(points)
+        print('points', points)
 
         points_formatted = []
         points_formatted_to_label = []
@@ -109,7 +100,7 @@ class DataLabeling:
         if len(unique_labels) == 1:
             for p in self.df.to_dict(orient='records'):
                 labelless_data.append([p['x'], p['y']])
-            op = KMeans(n_clusters=2)
+            op = KMeans(n_clusters=1)
             op.fit(labelless_data)
             i = 0
             for p in self.df.to_dict(orient='records'):
@@ -210,6 +201,9 @@ class DataLabeling:
     def return_graph(self, title):
         fig, axes = plt.subplots(1, 2, figsize=(6, 5))
 
+        print('self.df', self.df)
+        print('self.df_masses', self.df_masses)
+
         sns.scatterplot(
             data=self.df,
             x='x',
@@ -223,7 +217,7 @@ class DataLabeling:
         axes[0].set_xlabel("X")
         axes[0].set_ylabel("Y")
         axes[0].set_xlim(0, 500)
-        axes[0].set_ylim(-1, 1)
+        axes[0].set_ylim(0, 500)
 
         sns.scatterplot(
             data=self.df_masses,
@@ -239,7 +233,7 @@ class DataLabeling:
         axes[1].set_xlabel("X")
         axes[1].set_ylabel("Y")
         axes[1].set_xlim(0, 500)
-        axes[1].set_ylim(-1, 1)
+        axes[1].set_ylim(0, 500)
 
         plt.suptitle(title)
         plt.tight_layout()
@@ -463,8 +457,9 @@ class Compare:
                 valid_entries.append(entry)
 
         # Print the valid entries
+        print("valid entries", valid_entries)
         for valid_entry in valid_entries:
-            print("valid entries", valid_entry)
+            print("valid entry", valid_entry)
 
         self.max = 0
         self.maxPos = None
@@ -481,7 +476,9 @@ class Compare:
                     self.max = score
                     self.maxPos = v
 
-        print(self.max)
+        print('self.max', self.max)
+
+        print('self.maxPos', self.maxPos)
 
         self.maxPos = pd.DataFrame(list(self.maxPos),
                               columns=['x', 'y', 'auto_score', 'team', 'label']
