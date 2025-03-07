@@ -1,3 +1,5 @@
+from random import randint
+from time import sleep
 from flask import Flask, jsonify, send_file
 from functions.auto_compatibility import DataLabeling, Compare, nyan
 from functions.tele_compatibility import StrategyLabeling
@@ -76,6 +78,12 @@ def get_tele_data(event, team):
 @cross_origin()
 def gimme_meow():
     return send_file(nyan(), mimetype='image/png'), 200
+
+@app.route("/number", methods=['GET'])
+@cross_origin()
+def number():
+    sleep(randint(2, 10))
+    return jsonify({ 'compatibility': randint(0, 100)}), 200
 
 if __name__ == "__main__": 
     app.run(debug=True)
