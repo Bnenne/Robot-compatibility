@@ -1,5 +1,6 @@
 import requests, os, json
 from dotenv import load_dotenv
+from mezmorize import Cache
 
 class ScoutingAPI:
     def __init__(self, event_key, team_key):
@@ -8,9 +9,9 @@ class ScoutingAPI:
         load_dotenv()
         self.api_key = os.getenv("API_KEY")
         if 'events' in event_key:
-            events = requests.get('https://www.thebluealliance.com/api/v3/team/'+self.team_key+'/events/2025/simple?X-TBA-Auth-Key='+self.api_key)
-            print(events.json())
-            for event in events.json():
+            events = api_call('https://www.thebluealliance.com/api/v3/team/'+self.team_key+'/events/2025/simple?X-TBA-Auth-Key='+self.api_key)
+            print(events)
+            for event in events:
                 self.event_key.append(event.get("key"))
         else:
             self.event_key.append(event_key)
@@ -19,8 +20,8 @@ class ScoutingAPI:
 
         for key in self.event_key:
             print('http://scouting.team1710.com/api/'+key+'/'+self.team_key)
-            r = requests.get('http://scouting.team1710.com/api/'+key+'/'+self.team_key)
-            for e in r.json():
+            r = api_call('http://scouting.team1710.com/api/'+key+'/'+self.team_key)
+            for e in r:
                 self.data.append(e)
 
         # self.data = []
@@ -75,7 +76,7 @@ class ScoutingAPI:
                         intake_locations['barge'] += 1
             starts.append(
                 {
-                'x': e['pregame']['startPosition']['x'],
+                'x': 0,
                 'y': e['pregame']['startPosition']['y'],
                 'auto_score': auto_score,
                 'team': e['team'],
@@ -119,3 +120,10 @@ def return_teams(event):
     api_key = os.getenv("API_KEY")
     data = requests.get('https://www.thebluealliance.com/api/v3/event/'+event+'/teams/simple?X-TBA-Auth-Key=' + api_key)
     return data.json()
+
+cache = Cache(CACHE_TYPE='filesystem', CACHE_DIR='cache')
+
+@cache.memoize()
+def api_call(url):
+    response = requests.get(url)
+    return response.json() if response.status_code == 200 else None

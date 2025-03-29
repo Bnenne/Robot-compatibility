@@ -199,7 +199,7 @@ class DataLabeling:
                               "barge"
                           ])
     def return_graph(self, title):
-        fig, axes = plt.subplots(1, 2, figsize=(6, 5))
+        fig, axes = plt.subplots(1, 2, figsize=(4, 8))
 
         print('self.df', self.df)
         print('self.df_masses', self.df_masses)
@@ -216,8 +216,8 @@ class DataLabeling:
         )
         axes[0].set_xlabel("X")
         axes[0].set_ylabel("Y")
-        axes[0].set_xlim(0, 500)
-        axes[0].set_ylim(0, 500)
+        axes[0].set_xlim(-1, 1)
+        axes[0].set_ylim(0, 337)
 
         sns.scatterplot(
             data=self.df_masses,
@@ -232,8 +232,8 @@ class DataLabeling:
 
         axes[1].set_xlabel("X")
         axes[1].set_ylabel("Y")
-        axes[1].set_xlim(0, 500)
-        axes[1].set_ylim(0, 500)
+        axes[1].set_xlim(-1, 1)
+        axes[1].set_ylim(0, 337)
 
         plt.suptitle(title)
         plt.tight_layout()
@@ -404,7 +404,7 @@ class Compare:
                 d['y']
             ])
 
-        eps = 40
+        eps = 100
         min_samples = 1
         db = DBSCAN(eps=eps, min_samples=min_samples)
         db.fit(to_label)
@@ -436,45 +436,61 @@ class Compare:
 
         print(self.combined_data.to_dict(orient='records'))
 
-        combination = combinations(self.combined_data.to_dict(orient='records'), len(teams_single))
+        change = 0
 
-        valid_entries = []
+        def get_max():
+            combination = combinations(self.combined_data.to_dict(orient='records'), len(teams_single) - change)
 
-        for entry in combination:
-            teams_seen = set()
-            labels_seen = set()
-            is_valid = True
-            for dict_item in entry:
-                team = dict_item['team']
-                label = dict_item['label']
+            valid_entries = []
 
-                if team in teams_seen or label in labels_seen:
-                    is_valid = False
-                    break
-                teams_seen.add(team)
-                labels_seen.add(label)
-            if is_valid:
-                valid_entries.append(entry)
+            for entry in combination:
+                teams_seen = set()
+                labels_seen = set()
+                is_valid = True
+                for dict_item in entry:
+                    team = dict_item['team']
+                    label = dict_item['label']
 
-        # Print the valid entries
-        print("valid entries", valid_entries)
-        for valid_entry in valid_entries:
-            print("valid entry", valid_entry)
+                    if team in teams_seen or label in labels_seen:
+                        is_valid = False
+                        break
+                    teams_seen.add(team)
+                    labels_seen.add(label)
+                if is_valid:
+                    valid_entries.append(entry)
 
-        self.max = 0
-        self.maxPos = None
+            # Print the valid entries
+            print("valid entries", valid_entries)
+            for valid_entry in valid_entries:
+                print("valid entry", valid_entry)
 
-        for v in valid_entries:
-            if len(teams_single) == 2:
-                score = v[0]['auto_score'] + v[1]['auto_score']
-                if score > self.max:
-                    self.max = score
-                    self.maxPos = v
-            if len(teams_single) == 3:
-                score = v[0]['auto_score'] + v[1]['auto_score'] + v[2]['auto_score']
-                if score > self.max:
-                    self.max = score
-                    self.maxPos = v
+            m = 0
+
+            mp = None
+
+            for v in valid_entries:
+                if len(teams_single) - change == 2:
+                    score = v[0]['auto_score'] + v[1]['auto_score']
+                    if score > m:
+                        m = score
+                        mp = v
+                if len(teams_single) - change == 3:
+                    score = v[0]['auto_score'] + v[1]['auto_score'] + v[2]['auto_score']
+                    if score > m:
+                        m = score
+                        mp = v
+
+            return m, mp
+
+        self.max, self.maxPos = get_max()
+        if self.maxPos is None:
+            change = 1
+            self.max, self.maxPos = get_max()
+        if self.maxPos is None:
+            change = 2
+            self.max, self.maxPos = get_max()
+
+        # maxPos_len = len(list(self.maxPos))
 
         print('self.max', self.max)
 
@@ -497,7 +513,7 @@ class Compare:
     def return_compare_graph(self, title):
         team_length = len(self.team_key)
 
-        fig, axes = plt.subplots((1 * team_length) + 1, 2, figsize=(6, team_length + 5))
+        fig, axes = plt.subplots((1 * team_length) + 1, 2, figsize=(4, team_length + 8))
 
         i = 0
 
@@ -531,8 +547,8 @@ class Compare:
             )
             axes[i, 0].set_xlabel("X")
             axes[i, 0].set_ylabel("Y")
-            axes[i, 0].set_xlim(0, 500)
-            axes[i, 0].set_ylim(-1, 1)
+            axes[i, 0].set_xlim(-1, 1)
+            axes[i, 0].set_ylim(0, 337)
 
             sns.scatterplot(
                 data=masses,
@@ -546,8 +562,8 @@ class Compare:
             )
             axes[i, 1].set_xlabel("X")
             axes[i, 1].set_ylabel("Y")
-            axes[i, 1].set_xlim(0, 500)
-            axes[i, 1].set_ylim(-1, 1)
+            axes[i, 1].set_xlim(-1, 1)
+            axes[i, 1].set_ylim(0, 337)
             i += 1
 
         sns.scatterplot(
@@ -562,8 +578,8 @@ class Compare:
         )
         axes[i, 0].set_xlabel("X")
         axes[i, 0].set_ylabel("Y")
-        axes[i, 0].set_xlim(0, 500)
-        axes[i, 0].set_ylim(-1, 1)
+        axes[i, 0].set_xlim(-1, 1)
+        axes[i, 0].set_ylim(0, 337)
 
         sns.barplot(
             data=self.compatibility_data,
