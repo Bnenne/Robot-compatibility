@@ -3,7 +3,7 @@ name: Build Docker Image
 on:
   push:
     branches:
-      - REEFSCAPE
+      - main
 
 env:
   REGISTRY: ghcr.io
