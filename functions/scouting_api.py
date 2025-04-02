@@ -1,6 +1,6 @@
-import requests, os, json
+import requests, os, json, pickle
 from dotenv import load_dotenv
-from mezmorize import Cache
+from functools import wraps
 
 class ScoutingAPI:
     def __init__(self, event_key, team_key):
@@ -121,9 +121,28 @@ def return_teams(event):
     data = requests.get('https://www.thebluealliance.com/api/v3/event/'+event+'/teams/simple?X-TBA-Auth-Key=' + api_key)
     return data.json()
 
-cache = Cache(CACHE_TYPE='filesystem', CACHE_DIR='cache')
+def cache(func):
+    @wraps(func)
+    def wrapper(*args, **kwargs):
+        try:
+            cached = pickle.load(open("cache.p", "rb"))
+            return cached[str(*args)]
+        except:
+            result = func(*args, **kwargs)
+            try:
+                cached = pickle.load(open("cache.p", "rb"))
+                cached[str(*args)] = result
+            except:
+                cached = {str(*args): result}
+            try:
+                pickle.dump(cached, open("cache.p", "wb"))
+            except:
+                with open("cache.p", "wb") as f:
+                    pickle.dump(cached, f)
+            return result
+    return wrapper
 
-@cache.memoize()
+@cache
 def api_call(url):
     response = requests.get(url)
     return response.json() if response.status_code == 200 else None
