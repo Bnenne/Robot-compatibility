@@ -1,6 +1,7 @@
 import requests, os, json, pickle
 from dotenv import load_dotenv
 from functools import wraps
+from datetime import datetime, timezone, timedelta
 
 class ScoutingAPI:
     def __init__(self, event_key, team_key):
@@ -126,14 +127,25 @@ def cache(func):
     def wrapper(*args, **kwargs):
         try:
             cached = pickle.load(open("cache.p", "rb"))
-            return cached[str(*args)]
+            current_utc_time = datetime.now(timezone.utc)
+            if current_utc_time >= cached[str(*args)]["timestamp"] + timedelta(minutes=10):
+                result = func(*args, **kwargs)
+                cached[str(*args)] = {"data": result, "timestamp": datetime.now(timezone.utc)}
+                try:
+                    pickle.dump(cached, open("cache.p", "wb"))
+                except:
+                    with open("cache.p", "wb") as f:
+                        pickle.dump(cached, f)
+                    return result
+            else:
+                return cached[str(*args)]["data"]
         except:
             result = func(*args, **kwargs)
             try:
                 cached = pickle.load(open("cache.p", "rb"))
-                cached[str(*args)] = result
+                cached[str(*args)] = {"data": result, "timestamp": datetime.now(timezone.utc)}
             except:
-                cached = {str(*args): result}
+                cached = {str(*args): {"data": result, "timestamp": datetime.now(timezone.utc)}}
             try:
                 pickle.dump(cached, open("cache.p", "wb"))
             except:
