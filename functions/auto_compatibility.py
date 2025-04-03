@@ -1,17 +1,10 @@
-import math
-
 import pandas as pd
 import seaborn as sns
 import numpy as np
 import matplotlib.pyplot as plt
-from scipy.stats import zscore
 from sklearn.cluster import DBSCAN, KMeans
-from sklearn.covariance import EllipticEnvelope
-from sklearn.linear_model import LinearRegression
-from sklearn.preprocessing import MinMaxScaler
-
-from functions.scouting_api import ScoutingAPI, return_teams
-import io, requests, json, re
+from functions.scouting_api import ScoutingAPI
+import io, math
 from itertools import combinations
 
 class DataLabeling:

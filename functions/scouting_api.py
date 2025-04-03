@@ -1,10 +1,16 @@
-import requests, os, json, pickle
+import requests, os, pickle
 from dotenv import load_dotenv
 from functools import wraps
 from datetime import datetime, timezone, timedelta
 
 class ScoutingAPI:
     def __init__(self, event_key, team_key):
+        """Initializes the ScoutingAPI class with the given event key and team key
+
+        Args:
+            event_key (str): The event key (e.g., '2025cttd') or 'events' for all events
+            team_key (str): The team key (e.g., 'frc1710')
+        """
         self.event_key = []
         self.team_key = team_key
         load_dotenv()
@@ -22,8 +28,9 @@ class ScoutingAPI:
         for key in self.event_key:
             print('http://scouting.team1710.com/api/'+key+'/'+self.team_key)
             r = api_call('http://scouting.team1710.com/api/'+key+'/'+self.team_key)
-            for e in r:
-                self.data.append(e)
+            if r is not None:
+                for e in r:
+                    self.data.append(e)
 
         # self.data = []
         # self.team_key = team_key[3:]
@@ -36,6 +43,11 @@ class ScoutingAPI:
         #         self.data.append(f)
 
     def get_starts(self):
+        """Retrieves the starting positions and auto scores for the team
+
+        Returns:
+            list: A list of dictionaries containing the starting positions and auto scores for each match
+        """
         # with open(str(self.team_key)+'.json', 'r') as f:
         #     self.data = json.load(f)
 
@@ -44,6 +56,14 @@ class ScoutingAPI:
         return starts
 
     def starts(self, data):
+        """Processes the data to extract starting positions and auto scores
+
+        Args:
+            data (list): The list of match data for the team
+
+        Returns:
+            list: A list of dictionaries containing the starting positions and auto scores for each match
+        """
         starts = []
 
         print('starts data', data)
@@ -123,6 +143,11 @@ def return_teams(event):
     return data.json()
 
 def cache(func):
+    """A decorator to cache the results of a function for 10 minutes using pickle
+
+    Args:
+        func (function): The function to be cached
+    """
     @wraps(func)
     def wrapper(*args, **kwargs):
         try:
@@ -156,5 +181,10 @@ def cache(func):
 
 @cache
 def api_call(url):
+    """Makes an API call to the given URL and returns the JSON response
+
+    Args:
+        url (str): The URL to make the API call to
+    """
     response = requests.get(url)
     return response.json() if response.status_code == 200 else None
