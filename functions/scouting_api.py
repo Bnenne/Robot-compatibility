@@ -115,7 +115,7 @@ def cache(func):
     def wrapper(*args, **kwargs):
         try: # Attempt to load the cached data from the pickle file
             cached = pickle.load(open("cache.p", "rb")) # Load the cached data from the pickle file
-            current_utc_time = datetime.now(timezone.utc) # Get the current UTC time
+            current_utc_time = datetime.now(timezone.utc)
             if current_utc_time >= cached[str(*args)]["timestamp"] + timedelta(minutes=10): # Check if the cached data is older than 10 minutes
                 result = func(*args, **kwargs) # Call the original function to get fresh data
                 cached[str(*args)] = {"data": result, "timestamp": datetime.now(timezone.utc)} # Update the cache with the new result and timestamp
@@ -126,7 +126,7 @@ def cache(func):
                         pickle.dump(cached, f)
                     return result
             else: # If the cached data is still valid (not older than 10 minutes)
-                return cached[str(*args)]["data"] # Return the cached data
+                return cached[str(*args)]["data"]
         except: # If the cache file does not exist or is corrupted, create a new cache
             result = func(*args, **kwargs) # Call the original function to get fresh data
             try: # Attempt to create a new cache file or load existing cache
