@@ -2,6 +2,7 @@ import requests, os, pickle
 from dotenv import load_dotenv
 from functools import wraps
 from datetime import datetime, timezone, timedelta
+import httpx
 
 class ScoutingAPI:
     def __init__(self, event_key, team_key):
@@ -61,16 +62,10 @@ class ScoutingAPI:
                 if a.get('action') == 'score': # Count the auto score
                     auto_score += 1
                 if a.get('action') == 'intake': # Count the intakes based on location
-                    if a.get('location') == 'processor':
-                        intake_locations['processor'] += 1
-                    if a.get('location') == 'coral_station':
+                    if a.get('location') is 'coral_station_left' or 'coral_station_right':
                         intake_locations['coral_station'] += 1
-                    if a.get('location') == 'reef':
-                        intake_locations['reef'] += 1
-                    if a.get('location') == 'alliance':
-                        intake_locations['alliance'] += 1
-                    if a.get('location') == 'barge':
-                        intake_locations['barge'] += 1
+                    else:
+                        intake_locations[a.get('location')] += 1
             starts.append( # Create a dictionary for each match with the starting position and auto score
                 {
                 'x': 0,
@@ -143,11 +138,12 @@ def cache(func):
     return wrapper
 
 @cache # Cache the data to avoid frequent API calls and speed up the response time
-def api_call(url):
+async def api_call(url):
     """Makes an API call to the given URL and returns the JSON response
 
     Args:
         url (str): The URL to make the API call to
     """
-    response = requests.get(url)
+    async with httpx.AsyncClient() as client:
+        response = await client.get(url)
     return response.json() if response.status_code == 200 else None
