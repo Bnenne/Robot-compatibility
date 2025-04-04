@@ -2,7 +2,6 @@ import requests, os, pickle
 from dotenv import load_dotenv
 from functools import wraps
 from datetime import datetime, timezone, timedelta
-import httpx
 
 class ScoutingAPI:
     def __init__(self, event_key, team_key):
@@ -138,12 +137,11 @@ def cache(func):
     return wrapper
 
 @cache # Cache the data to avoid frequent API calls and speed up the response time
-async def api_call(url):
+def api_call(url):
     """Makes an API call to the given URL and returns the JSON response
 
     Args:
         url (str): The URL to make the API call to
     """
-    async with httpx.AsyncClient() as client:
-        response = await client.get(url)
+    response = requests.get(url)
     return response.json() if response.status_code == 200 else None
