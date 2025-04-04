@@ -13,62 +13,38 @@ class ScoutingAPI:
         """
         self.event_key = []
         self.team_key = team_key
+
         load_dotenv()
         self.api_key = os.getenv("API_KEY")
-        if 'events' in event_key:
+
+        if 'events' in event_key: # Check if the event_key is 'events' to get all events
             events = api_call('https://www.thebluealliance.com/api/v3/team/'+self.team_key+'/events/2025/simple?X-TBA-Auth-Key='+self.api_key)
             print(events)
             for event in events:
                 self.event_key.append(event.get("key"))
-        else:
+        else:  # If a specific event key is provided
             self.event_key.append(event_key)
 
         self.data = []
 
-        for key in self.event_key:
+        for key in self.event_key: # Loop through each event key
             print('http://scouting.team1710.com/api/'+key+'/'+self.team_key)
             r = api_call('http://scouting.team1710.com/api/'+key+'/'+self.team_key)
-            if r is not None:
+            if r is not None: # Check if the response is not None, been having issues with NoneType responses
                 for e in r:
                     self.data.append(e)
 
-        # self.data = []
-        # self.team_key = team_key[3:]
-        #
-        # with open('data.json', 'r') as f:
-        #     file_data = json.load(f)
-        #
-        # for f in file_data:
-        #     if f['team'] == self.team_key:
-        #         self.data.append(f)
-
-    def get_starts(self):
-        """Retrieves the starting positions and auto scores for the team
-
-        Returns:
-            list: A list of dictionaries containing the starting positions and auto scores for each match
-        """
-        # with open(str(self.team_key)+'.json', 'r') as f:
-        #     self.data = json.load(f)
-
-        starts = self.starts(self.data)
-
-        return starts
-
-    def starts(self, data):
+    def starts(self):
         """Processes the data to extract starting positions and auto scores
-
-        Args:
-            data (list): The list of match data for the team
 
         Returns:
             list: A list of dictionaries containing the starting positions and auto scores for each match
         """
         starts = []
 
-        print('starts data', data)
+        print('starts data', self.data)
 
-        for e in data:
+        for e in self.data: # Iterate through each match data
             auto_actions = []
             auto_score = 0
             intake_locations = {
@@ -78,13 +54,13 @@ class ScoutingAPI:
                 'alliance': 0,
                 'barge': 0
             }
-            for d in e['actions']:
+            for d in e['actions']: # Iterate through each action in the match
                 if d.get('phase') == 'auto':
                     auto_actions.append(d)
-            for a in auto_actions:
-                if a.get('action') == 'score':
+            for a in auto_actions: # Process only auto actions
+                if a.get('action') == 'score': # Count the auto score
                     auto_score += 1
-                if a.get('action') == 'intake':
+                if a.get('action') == 'intake': # Count the intakes based on location
                     if a.get('location') == 'processor':
                         intake_locations['processor'] += 1
                     if a.get('location') == 'coral_station':
@@ -95,7 +71,7 @@ class ScoutingAPI:
                         intake_locations['alliance'] += 1
                     if a.get('location') == 'barge':
                         intake_locations['barge'] += 1
-            starts.append(
+            starts.append( # Create a dictionary for each match with the starting position and auto score
                 {
                 'x': 0,
                 'y': e['pregame']['startPosition']['y'],
@@ -111,19 +87,6 @@ class ScoutingAPI:
 
         print('starts', starts)
         return starts
-
-    def get_tele_actions(self):
-        # with open(str(self.team_key)+'.json', 'r') as f:
-        #     self.data = json.load(f)
-
-        actions = []
-
-        for d in self.data:
-            for e in d['actions']:
-                if e['phase'] == 'teleOp':
-                    actions.append(e)
-
-        return actions
 
 def return_scoutingapi():
     events = requests.get('http://scouting.team1710.com/api/key/event')
@@ -150,36 +113,36 @@ def cache(func):
     """
     @wraps(func)
     def wrapper(*args, **kwargs):
-        try:
-            cached = pickle.load(open("cache.p", "rb"))
-            current_utc_time = datetime.now(timezone.utc)
-            if current_utc_time >= cached[str(*args)]["timestamp"] + timedelta(minutes=10):
-                result = func(*args, **kwargs)
-                cached[str(*args)] = {"data": result, "timestamp": datetime.now(timezone.utc)}
-                try:
+        try: # Attempt to load the cached data from the pickle file
+            cached = pickle.load(open("cache.p", "rb")) # Load the cached data from the pickle file
+            current_utc_time = datetime.now(timezone.utc) # Get the current UTC time
+            if current_utc_time >= cached[str(*args)]["timestamp"] + timedelta(minutes=10): # Check if the cached data is older than 10 minutes
+                result = func(*args, **kwargs) # Call the original function to get fresh data
+                cached[str(*args)] = {"data": result, "timestamp": datetime.now(timezone.utc)} # Update the cache with the new result and timestamp
+                try: # Attempt to save the updated cache back to the pickle file
                     pickle.dump(cached, open("cache.p", "wb"))
-                except:
+                except: # If there's an error saving, ensure the file is opened correctly
                     with open("cache.p", "wb") as f:
                         pickle.dump(cached, f)
                     return result
-            else:
-                return cached[str(*args)]["data"]
-        except:
-            result = func(*args, **kwargs)
-            try:
+            else: # If the cached data is still valid (not older than 10 minutes)
+                return cached[str(*args)]["data"] # Return the cached data
+        except: # If the cache file does not exist or is corrupted, create a new cache
+            result = func(*args, **kwargs) # Call the original function to get fresh data
+            try: # Attempt to create a new cache file or load existing cache
                 cached = pickle.load(open("cache.p", "rb"))
                 cached[str(*args)] = {"data": result, "timestamp": datetime.now(timezone.utc)}
-            except:
+            except: # If the cache file does not exist or is corrupted, create a new cache
                 cached = {str(*args): {"data": result, "timestamp": datetime.now(timezone.utc)}}
-            try:
+            try: # Attempt to save the updated cache back to the pickle file
                 pickle.dump(cached, open("cache.p", "wb"))
-            except:
+            except: # If there's an error saving, ensure the file is opened correctly
                 with open("cache.p", "wb") as f:
                     pickle.dump(cached, f)
             return result
     return wrapper
 
-@cache
+@cache # Cache the data to avoid frequent API calls and speed up the response time
 def api_call(url):
     """Makes an API call to the given URL and returns the JSON response
 

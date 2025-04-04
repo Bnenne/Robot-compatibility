@@ -19,7 +19,7 @@ class DataLabeling:
         self.team_key = team_key
         sa = ScoutingAPI(self.event_key, self.team_key)
 
-        points = sa.get_starts()
+        points = sa.starts()
 
         print('points', points)
 
@@ -529,6 +529,14 @@ class Compare:
         print('compatibility_data', self.compatibility_data)
 
     def return_compare_graph(self, title):
+        """Generates a comparison graph for the teams and their compatibility.
+
+        Args:
+            title (str): The title for the graph.
+
+        Returns:
+            io.BytesIO: A buffer containing the saved comparison graph image in PNG format.
+        """
         team_length = len(self.team_key)
 
         fig, axes = plt.subplots((1 * team_length) + 1, 2, figsize=(4, team_length + 8))
@@ -620,4 +628,9 @@ class Compare:
 
         return buf
     def return_compare_data(self):
+        """Returns the comparison data for the teams, including compatibility and theoretical maximum.
+
+        Returns:
+            dict: A dictionary containing the teams' data, combined maximum positions, compatibility percentage, theoretical maximum, and realistic maximum.
+        """
         return {'teams': self.data, 'combined': self.maxPos.to_dict(orient='records'), 'compatibility': self.compatibility, 'theoretical': self.theoretical_max, 'realistic': self.max}
