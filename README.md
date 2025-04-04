@@ -3,14 +3,14 @@ This is a python program created by a member of the Informatics Subteam on FRC T
 All data used in this project is taken from:\
 Statbotics (https://www.statbotics.io/) \
 The Blue Alliance (https://www.thebluealliance.com/) \
-1710 Scouting (https://team1710scouting.vercel.app/), this is the website that the informatics team on FRC Team 1710 creates in order to collect data on other FRC teams.
+1710 Scouting (https://team1710scouting.vercel.app/), this is the website that the Informatics subteam on FRC Team 1710 creates in order to collect data on other FRC teams.
 
 ## Goal
 The goal of this project is to create a program that can determine how compatible two robots are.\
 However, this project is a **WORK IN PROGRESS** and the current compatibility score **DOESN'T** reflect the entire compatibility truth.
 
 This project is intended to be used as an API route, but you can also use this frontend I created:\
-https://macro.apisb.me/
+https://compare.apibg.me/
 
 ## Use
 Currently, the project has four routes with more to come:\
@@ -32,17 +32,17 @@ The current approach calculates a theoretical maximum by summing the highest ave
 The compatibility score is the percentage of the theoretical maximum they're able to achieve with the realistic maximum.
 
 ## Try it out
-Try visiting https://micro.apisb.me/auto/graph/events/frc1710 \
+Try visiting https://compare.apibg.me/auto/graph/events/frc1710 \
 or **Auto** - **Graph** - **All 2024 Events** - **1710** via the front end \
-https://macro.apisb.me/ \
+https://compatibility.apibg.me/ \
 You should get a graph like this:\
 ![example graph](https://cloud-2za8i7bzm-hack-club-bot.vercel.app/0frc1710.png)
 
 ### or
 
-Try visiting https://micro.apisb.me/auto/compare/graph/events/frc1710/frc1730/frc1986 \
+Try visiting https://compare.apibg.me/auto/compare/graph/events/frc1710/frc1730/frc1986 \
 or **Auto** - **Compare** - **All 2024 Events** - **1710** - **1730** - **1986** via the front end \
-https://macro.apisb.me/ \
+https://compatibility.apibg.me/ \
 You should get a graph like this:\
 ![example graph](https://cloud-h2vbe2hdh-hack-club-bot.vercel.app/0image.png)
 

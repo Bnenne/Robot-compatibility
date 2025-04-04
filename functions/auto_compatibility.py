@@ -9,6 +9,12 @@ from itertools import combinations
 
 class DataLabeling:
     def __init__(self, event_key, team_key):
+        """Initializes the DataLabeling class with the given event key and team key
+
+        Args:
+            event_key (str): The event key (e.g., '2025cttd') or 'events' for all events
+            team_key (str): The team key (e.g., 'frc1710')
+        """
         self.event_key = event_key
         self.team_key = team_key
         sa = ScoutingAPI(self.event_key, self.team_key)
@@ -192,6 +198,14 @@ class DataLabeling:
                               "barge"
                           ])
     def return_graph(self, title):
+        """Generates a scatter plot graph for the labeled data and mass points.
+
+        Args:
+            title (str): The title for the graph.
+
+        Returns:
+            io.BytesIO: A buffer containing the saved graph image in PNG format.
+        """
         fig, axes = plt.subplots(1, 2, figsize=(4, 8))
 
         print('self.df', self.df)
@@ -238,10 +252,21 @@ class DataLabeling:
 
         return buf
     def return_data(self):
+        """Returns the labeled data and mass points as dictionaries.
+
+        Returns:
+            dict: A dictionary containing the general labeled data and mass points.
+        """
         return {'general': self.df.to_dict(), 'masses': self.df_masses.to_dict()}
 
 class Compare:
     def __init__(self, event_key, team_key):
+        """Initializes the Compare class with the given event key and team keys.
+
+        Args:
+            event_key (str): The event key (e.g., '2025cttd') or 'events' for all events
+            team_key (list): A list of team keys (e.g., ['frc1710', 'frc1234'])
+        """
         self.event_key = event_key
         self.team_key = team_key
         self.img_blue = plt.imread('functions/assets/starting_map.png')
