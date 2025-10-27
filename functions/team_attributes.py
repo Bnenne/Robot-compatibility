@@ -1,9 +1,11 @@
 from attributes import attribute_schema
+from starting_clusters import StartingClusters
 
 class TeamAttributes:
     def __init__(self, team):
         self.team = team
         self.attributes = attribute_schema
+        self.attributes["starting_clusters"] = StartingClusters()
 
     def place(self, phase, action, location):
         match_stats = self.attributes["phases"][phase]["place"]
@@ -68,3 +70,6 @@ class TeamAttributes:
                 else:
                     stats["ability"] = 1
                     stats["frequency"] = location_total  / total
+
+    def add_starting_position(self, x, y):
+        self.attributes["starting_clusters"].starting_positions.append((x, y))

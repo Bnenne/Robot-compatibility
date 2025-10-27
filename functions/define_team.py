@@ -9,7 +9,7 @@ with open(file_path, 'r', encoding='utf-8') as file:
     data = json.load(file)
 
 for doc in data:
-    if doc["team"] == team and doc['event'] not in exclude_events:
+    if doc["team"] == team.team and doc['event'] not in exclude_events:
         for action in doc['actions']:
 
             match action['action']:
@@ -34,7 +34,15 @@ for doc in data:
 
         team.climb(doc['climb']['type'])
         team.leave(doc['untimed']['exitAuto'])
+        team.add_starting_position( # Starting position selector dimensions 151x337
+            doc['pregame']['startPosition']['x'],
+            doc['pregame']['startPosition']['y']
+        )
 
 team.update()
 
 print(team.attributes)
+print(team.attributes['starting_clusters'].starting_positions)
+
+team.attributes['starting_clusters'].arrayify_data()
+team.attributes['starting_clusters'].create_graphs()

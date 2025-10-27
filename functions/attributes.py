@@ -3,6 +3,7 @@ attribute_schema = {
     "shallow_hang": -1,
     "no_hang": 1,
     "auto_leave": -1,
+    "starting_clusters": None,
     "phases": {
         "auto": {
             "algae_remover": -1,
