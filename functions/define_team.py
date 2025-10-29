@@ -44,6 +44,6 @@ team.update()
 print(team.attributes)
 print(team.attributes['starting_clusters'].starting_positions)
 
-team.attributes['starting_clusters'].arrayify_data()
+team.attributes['starting_clusters'].format_data()
 team.attributes['starting_clusters'].cluster()
 team.attributes['starting_clusters'].create_graphs()
