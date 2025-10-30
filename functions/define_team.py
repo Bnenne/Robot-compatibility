@@ -41,9 +41,8 @@ for doc in data:
 
 team.update()
 
-print(team.attributes)
-print(team.attributes['starting_clusters'].starting_positions)
-
 team.attributes['starting_clusters'].format_data()
 team.attributes['starting_clusters'].cluster()
-team.attributes['starting_clusters'].create_graphs()
+team.attributes['starting_clusters'].mass()
+
+team.attributes['starting_clusters'] = team.attributes['starting_clusters'].clusters
