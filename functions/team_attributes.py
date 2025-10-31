@@ -1,4 +1,4 @@
-from attributes import attribute_schema
+from schema import attribute_schema
 from starting_clusters import StartingClusters
 
 class TeamAttributes:

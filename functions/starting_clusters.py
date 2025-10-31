@@ -1,5 +1,4 @@
 import matplotlib.pyplot as plt
-import numpy as np
 import seaborn as sns
 from sklearn.cluster import DBSCAN
 from pandas import DataFrame
@@ -10,7 +9,7 @@ class StartingClusters:
         self.starting_positions = []
         self.df = DataFrame(columns=['x', 'y'])
 
-        self.clusters = DataFrame()
+        self.clusters = {}
 
         sns.set_theme(style="ticks")
 
@@ -59,7 +58,7 @@ class StartingClusters:
         filtered_df = self.df[self.df['label'].isin(multi_instance_clusters)].copy()
         unique_labels = filtered_df['label'].unique()
 
-        mapping = {unique_labels[i]: f"Auto {i + 1}" for i in range(len(unique_labels))}
+        mapping = {unique_labels[i]: f"auto_{i + 1}" for i in range(len(unique_labels))}
         filtered_df['label'] = filtered_df['label'].replace(mapping)
 
         self.df = filtered_df
@@ -73,4 +72,4 @@ class StartingClusters:
             y_sum = self.df[self.df['label'] == label]['y'].sum()
             count = len(self.df[self.df['label'] == label])
 
-            self.clusters[label] = y_sum / count
+            self.clusters[label] = (y_sum / count) / 337
