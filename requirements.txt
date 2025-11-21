@@ -10,3 +10,4 @@ Flask-Cors~=5.0.0
 matplotlib~=3.9.2
 keras~=3.7.0
 torch~=2.5.1
+tensorflow~=2.18.0

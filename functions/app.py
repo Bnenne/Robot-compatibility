@@ -1,12 +1,21 @@
 import os
 
+import keras
+
 os.environ["KERAS_BACKEND"] = "tensorflow"
+os.environ["LOKY_MAX_CPU_COUNT"] = "8"
 
-from define_team import define_team
 from model import Model
+from train import Trainer
+from functions.define_team import get_teams
 
-team = 1710
+epochs = 50
+optimizer = keras.optimizers.Adam(learning_rate=0.001)
 
-team_attributes = define_team(team)
+model = Model()
+model.build_model(50, 50)
 
-model = Model(team_attributes)
+teams = get_teams()
+
+trainer = Trainer(model, optimizer, teams)
+trainer.train(epochs)

@@ -1,9 +1,10 @@
 from team_attributes import TeamAttributes
 import json
 
+file_path = './data/2025entries.json'
+exclude_events = ['2025cttd', '2025practice']
+
 def define_team(team):
-    file_path = './data/2025entries.json'
-    exclude_events = ['2025cttd']
     team = TeamAttributes(team)
 
     with open(file_path, 'r', encoding='utf-8') as file:
@@ -33,7 +34,8 @@ def define_team(team):
                     case _:
                         pass
 
-            team.climb(doc['climb']['type'])
+            if 'climb' in doc:
+                team.climb(doc['climb']['type'])
             team.leave(doc['untimed']['exitAuto'])
             team.add_starting_position( # Starting position selector dimensions 151x337
                 doc['pregame']['startPosition']['x'],
@@ -49,3 +51,15 @@ def define_team(team):
     team.attributes['starting_clusters'] = team.attributes['starting_clusters'].clusters
 
     return team.attributes
+
+def get_teams():
+    teams = []
+
+    with open(file_path, 'r', encoding='utf-8') as file:
+        data = json.load(file)
+
+    for doc in data:
+        if doc['event'] not in exclude_events and doc['team'] not in teams:
+            teams.append(doc['team'])
+
+    return teams
