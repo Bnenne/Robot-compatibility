@@ -1,5 +1,5 @@
-from schema import attribute_schema
-from starting_clusters import StartingClusters
+from training.schema import attribute_schema
+from training.starting_clusters import StartingClusters
 
 class TeamAttributes:
     def __init__(self, team):

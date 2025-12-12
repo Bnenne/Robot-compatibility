@@ -1,7 +1,6 @@
 import tensorflow as tf
 
-from functions.schema import parameter_order
-
+from training.schema import parameter_order
 
 class Trainer:
     def __init__(self, model, optimizer, teams):
@@ -56,8 +55,6 @@ class Trainer:
         # Negative reward (we minimize loss = maximize reward)
         # But scale it down and add regularization
         loss = -reward * 0.01 + reg_loss * 0.1
-
-        return loss
 
     def compute_reward(self, archetype_a, archetype_b, team):
         """

@@ -1,4 +1,4 @@
-from functions.define_team import define_team
+from training.define_team import define_team
 from schema import sort_attributes
 
 import keras
@@ -31,3 +31,6 @@ class Model:
         archetype_b = outputs[1]
 
         return archetype_a, archetype_b
+
+    def save_model(self, name):
+        self.model.save(name)

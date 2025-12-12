@@ -1,7 +1,7 @@
-from team_attributes import TeamAttributes
+from training.team_attributes import TeamAttributes
 import json
 
-file_path = './data/2025entries.json'
+file_path = '../data/2025entries.json'
 exclude_events = ['2025cttd', '2025practice']
 
 def define_team(team):
